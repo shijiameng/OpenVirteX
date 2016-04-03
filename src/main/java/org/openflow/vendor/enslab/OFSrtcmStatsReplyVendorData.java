@@ -1,20 +1,8 @@
 package org.openflow.vendor.enslab;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.openflow.protocol.Instantiable;
-import org.openflow.protocol.vendor.OFVendorData;
 
 public class OFSrtcmStatsReplyVendorData extends OFMarkerReplyVendorData {
-	protected static Instantiable<OFVendorData> instantiable = new Instantiable<OFVendorData>() {
-        @Override
-        public OFVendorData instantiate() {
-            return new OFSrtcmStatsReplyVendorData();
-        }
-    };
-    
-    public static Instantiable<OFVendorData> getInstantiable() {
-        return OFSrtcmStatsReplyVendorData.instantiable;
-    }
     
     protected long nPackets, nBytes;
     protected long nGreenPackets, nGreenBytes;

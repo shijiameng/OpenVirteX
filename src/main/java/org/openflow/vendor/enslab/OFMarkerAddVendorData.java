@@ -1,8 +1,20 @@
 package org.openflow.vendor.enslab;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.openflow.protocol.Instantiable;
+import org.openflow.protocol.vendor.OFVendorData;
 
 public class OFMarkerAddVendorData extends OFEnslabVendorData {
+	protected static Instantiable<OFVendorData> instantiable = new Instantiable<OFVendorData>() {
+        @Override
+        public OFVendorData instantiate() {
+            return new OFMarkerAddVendorData();
+        }
+    };
+    
+    public static Instantiable<OFVendorData> getInstantiable() {
+        return OFMarkerAddVendorData.instantiable;
+    }
     
     public static final int ENSLAB_MARKER_TYPE_SRTCM = 1;
     
@@ -12,7 +24,6 @@ public class OFMarkerAddVendorData extends OFEnslabVendorData {
     
     protected int markerType;
     protected int markerId;
-    //protected int markerLength;
     
     public OFMarkerAddVendorData() {
     	super(OFMarkerAddVendorData.ENSLAB_MARKER_ADD);
@@ -37,11 +48,6 @@ public class OFMarkerAddVendorData extends OFEnslabVendorData {
     	this.markerType = markerType;
     }
     
-    /*
-    public void setMarkerLength(final int markerLength) {
-    	this.markerLength = markerLength;
-    }*/
-    
     public int getMarkerId() {
     	return this.markerId;
     }
@@ -49,11 +55,6 @@ public class OFMarkerAddVendorData extends OFEnslabVendorData {
     public int getMarkerType() {
     	return this.markerType;
     }
-    
-    /*
-    public int getMarkerLength() {
-    	return this.markerLength;
-    }*/
     
     @Override
     public int getLength() {
@@ -65,8 +66,6 @@ public class OFMarkerAddVendorData extends OFEnslabVendorData {
         super.readFrom(data, length);
         this.markerType = data.readInt();
         this.markerId = data.readInt();
-        //this.markerLength = data.readInt();
-        //data.readInt(); // pad[4] 
     }
 
     @Override
@@ -74,7 +73,5 @@ public class OFMarkerAddVendorData extends OFEnslabVendorData {
         super.writeTo(data);
         data.writeInt(this.markerType);
         data.writeInt(this.markerId);
-        //data.writeInt(this.markerLength);
-        //data.writeInt(0); // pad[4]
     }
 }

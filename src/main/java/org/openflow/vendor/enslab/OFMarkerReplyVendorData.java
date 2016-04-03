@@ -1,8 +1,21 @@
 package org.openflow.vendor.enslab;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.openflow.protocol.Instantiable;
+import org.openflow.protocol.vendor.OFVendorData;
 
 public class OFMarkerReplyVendorData extends OFEnslabVendorData {
+	protected static Instantiable<OFVendorData> instantiable = new Instantiable<OFVendorData>() {
+        @Override
+        public OFVendorData instantiate() {
+            return new OFMarkerReplyVendorData();
+        }
+    };
+    
+    public static Instantiable<OFVendorData> getInstantiable() {
+        return OFMarkerReplyVendorData.instantiable;
+    }
+    
 	public static final int ENSLAB_MARKER_FEATURES_REPLY = 103;
     public static final int ENSLAB_MARKER_STATS_REPLY = 105;
     

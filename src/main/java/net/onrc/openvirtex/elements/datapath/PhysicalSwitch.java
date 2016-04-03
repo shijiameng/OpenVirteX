@@ -40,7 +40,7 @@ import org.openflow.protocol.OFPhysicalPort;
 import org.openflow.protocol.OFPort;
 import org.openflow.protocol.OFVendor;
 import org.openflow.protocol.statistics.OFStatistics;
-import org.openflow.vendor.enslab.OFAddSrtcmVendorData;
+import org.openflow.vendor.enslab.OFSrtcmAddVendorData;
 import org.openflow.vendor.enslab.OFEnslabVendorData;
 import org.openflow.vendor.enslab.OFMarkerRemoveVendorData;
 
@@ -209,7 +209,7 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         vendor.setXid(100);
         vendor.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
   
-        OFAddSrtcmVendorData request = new OFAddSrtcmVendorData(network.getTenantId());
+        OFSrtcmAddVendorData request = new OFSrtcmAddVendorData(network.getTenantId());
         request.setCIR(network.getCIR());
         request.setCBS(network.getCBS());
         request.setEBS(network.getEBS());

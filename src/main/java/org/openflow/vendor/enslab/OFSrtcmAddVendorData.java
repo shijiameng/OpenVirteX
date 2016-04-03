@@ -1,33 +1,19 @@
 package org.openflow.vendor.enslab;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.openflow.protocol.Instantiable;
-import org.openflow.protocol.vendor.OFVendorData;
 
-public class OFAddSrtcmVendorData extends OFMarkerAddVendorData {
-	protected static Instantiable<OFVendorData> instantiable = new Instantiable<OFVendorData>() {
-        @Override
-        public OFVendorData instantiate() {
-            return new OFAddSrtcmVendorData();
-        }
-    };
+public class OFSrtcmAddVendorData extends OFMarkerAddVendorData {
     
-    public static Instantiable<OFVendorData> getInstantiable() {
-        return OFAddSrtcmVendorData.instantiable;
-    }
+    protected int CIR;
+    protected long CBS, EBS;
     
-    private int CIR;
-    private long CBS, EBS;
-    
-    public OFAddSrtcmVendorData() {
+    public OFSrtcmAddVendorData() {
     	super();
     	super.setMarkerType(OFMarkerAddVendorData.ENSLAB_MARKER_TYPE_SRTCM);
-    	//super.setMarkerLength(24);
     }
     
-    public OFAddSrtcmVendorData(final int markerId) {
+    public OFSrtcmAddVendorData(final int markerId) {
     	super(markerId, OFMarkerAddVendorData.ENSLAB_MARKER_TYPE_SRTCM);
-    	//super.setMarkerLength(24);
     }
     
     public void setCIR(final int CIR) {
