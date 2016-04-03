@@ -3,8 +3,8 @@ package org.openflow.vendor.enslab;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public class OFMarkerReplyVendorData extends OFEnslabVendorData {
-	public static final int ENSLAB_MARKER_FEATURES_REQUEST = 102;
-    public static final int ENSLAB_MARKER_STATS_REQUEST = 104;
+	public static final int ENSLAB_MARKER_FEATURES_REPLY = 103;
+    public static final int ENSLAB_MARKER_STATS_REPLY = 105;
     
 	protected int markerId;
 	protected OFMarkerType markerType;

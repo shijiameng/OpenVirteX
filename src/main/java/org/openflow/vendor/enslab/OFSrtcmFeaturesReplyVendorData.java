@@ -20,7 +20,7 @@ public class OFSrtcmFeaturesReplyVendorData extends OFMarkerReplyVendorData {
     protected long CBS, EBS;
     
     public OFSrtcmFeaturesReplyVendorData() {
-    	super.setDataType(OFMarkerReplyVendorData.ENSLAB_MARKER_STATS_REQUEST);
+    	super.setDataType(OFMarkerReplyVendorData.ENSLAB_MARKER_FEATURES_REPLY);
     }
     
     public void setCIR(final int CIR) {
@@ -55,14 +55,18 @@ public class OFSrtcmFeaturesReplyVendorData extends OFMarkerReplyVendorData {
     @Override
     public void readFrom(final ChannelBuffer data, final int length) {
         super.readFrom(data, length);
-        
+        this.CIR = data.readInt();
         data.readInt();
+        this.CBS = data.readLong();
+        this.EBS = data.readLong();
     }
 
     @Override
     public void writeTo(final ChannelBuffer data) {
         super.writeTo(data);
-        data.writeInt(this.markerId);
-        data.writeInt(this.markerType.value());
+        data.writeInt(this.CIR);
+        data.writeInt(0);
+        data.writeLong(this.CBS);
+        data.writeLong(this.EBS);
     }
 }
