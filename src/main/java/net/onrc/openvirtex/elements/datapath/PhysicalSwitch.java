@@ -16,13 +16,14 @@
 package net.onrc.openvirtex.elements.datapath;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.onrc.openvirtex.core.io.OVXSendMsg;
 import net.onrc.openvirtex.elements.datapath.statistics.StatisticsManager;
-import net.onrc.openvirtex.elements.network.OVXNetwork;
+import net.onrc.openvirtex.elements.marker.Marker;
 import net.onrc.openvirtex.elements.network.PhysicalNetwork;
 import net.onrc.openvirtex.elements.port.PhysicalPort;
 import net.onrc.openvirtex.exceptions.SwitchMappingException;
@@ -40,9 +41,7 @@ import org.openflow.protocol.OFPhysicalPort;
 import org.openflow.protocol.OFPort;
 import org.openflow.protocol.OFVendor;
 import org.openflow.protocol.statistics.OFStatistics;
-import org.openflow.vendor.enslab.OFSrtcmAddVendorData;
-import org.openflow.vendor.enslab.OFEnslabVendorData;
-import org.openflow.vendor.enslab.OFMarkerRemoveVendorData;
+import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
 
 /**
  * The Class PhysicalSwitch.
@@ -55,7 +54,10 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
     private StatisticsManager statsMan = null;
     private AtomicReference<Map<Short, OVXPortStatisticsReply>> portStats;
     private AtomicReference<Map<Integer, List<OVXFlowStatisticsReply>>> flowStats;
-
+    // SJM NIaaS
+    private Map<Integer, Marker> markerMap;
+    private AtomicReference<Map<Integer, OFMarkerReplyVendorData>> markerStats;
+    // SJM NIaaS END
     /**
      * Unregisters OVXSwitches and associated virtual elements mapped to this
      * PhysicalSwitch. Called by unregister() when the PhysicalSwitch is torn
@@ -104,8 +106,29 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         this.portStats = new AtomicReference<Map<Short, OVXPortStatisticsReply>>();
         this.flowStats = new AtomicReference<Map<Integer, List<OVXFlowStatisticsReply>>>();
         this.statsMan = new StatisticsManager(this);
+        // SJM NIaaS
+        this.markerMap = new HashMap<Integer, Marker>();
+        this.markerStats = new AtomicReference<Map<Integer, OFMarkerReplyVendorData>>();
+        // SJM NIaaS END
     }
 
+    // SJM NIaaS
+    public void addMarker(Marker marker) {
+    	this.markerMap.put(marker.getMarkerId(), marker);
+    }
+    
+    public void removeMarker(Marker marker) {
+    	this.markerMap.remove(marker.getMarkerId());
+    }
+    
+    public Marker getMarker(Integer markerId) {
+    	return this.markerMap.get(markerId);
+    }
+    
+    public Marker[] getAllMarkers() {
+    	return this.markerMap.values().toArray(new Marker[0]);
+    }
+    // SJM NIaaS END
     /**
      * Gets the OVX port number.
      *
@@ -199,37 +222,9 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         PhysicalNetwork.getInstance().addSwitch(this);
         this.fillPortMap();
         this.statsMan.start();
+        
         return true;
     }
-
-    // SJM NIaaS: Method for installing a marker to physical datapath
-    public void installMarker(OVXNetwork network) {
-    	OFVendor vendor = new OFVendor();
-    	    	
-        vendor.setXid(100);
-        vendor.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
-  
-        OFSrtcmAddVendorData request = new OFSrtcmAddVendorData(network.getTenantId());
-        request.setCIR(network.getCIR());
-        request.setCBS(network.getCBS());
-        request.setEBS(network.getEBS());
-        vendor.setVendorData(request);
-        vendor.setLengthU(OFVendor.MINIMUM_LENGTH + request.getLength());
-        sendMsg(vendor, null);
-    }
-    
-    public void removeMarker(final int markerId) {
-    	OFVendor vendor = new OFVendor();
-    	vendor.setXid(100);
-    	vendor.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
-    	
-    	OFMarkerRemoveVendorData request = new OFMarkerRemoveVendorData(markerId);
-    	vendor.setVendorData(request);
-    	vendor.setLengthU(OFVendor.MINIMUM_LENGTH + request.getLength());
-    	sendMsg(vendor, null);
-    	
-    }
-    // SJM NIaaS END
     
     /**
      * Removes this PhysicalSwitch from the network. Also removes associated
@@ -312,6 +307,16 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         this.flowStats.set(stats);
 
     }
+    
+    // SJM NIaaS
+    public void setMarkerStatistics(Integer markerId, OFMarkerReplyVendorData stats) {
+    	this.markerStats.get().put(markerId, stats);
+    }
+    
+    public OFMarkerReplyVendorData getMarkerStatistics(Integer markerId) {
+    	return this.markerStats.get().get(markerId);
+    }
+    // SJM NIaaS END
 
     public List<OVXFlowStatisticsReply> getFlowStats(int tid) {
         Map<Integer, List<OVXFlowStatisticsReply>> stats = this.flowStats.get();

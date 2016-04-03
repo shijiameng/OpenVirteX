@@ -19,6 +19,9 @@ import net.onrc.openvirtex.elements.datapath.OVXSwitch;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
 
 import org.openflow.protocol.OFVendor;
+import org.openflow.protocol.vendor.OFVendorData;
+import org.openflow.vendor.enslab.OFEnslabVendorData;
+import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
 
 public class OVXVendor extends OFVendor implements Virtualizable,
         Devirtualizable {
@@ -30,7 +33,18 @@ public class OVXVendor extends OFVendor implements Virtualizable,
 
     @Override
     public void virtualize(final PhysicalSwitch sw) {
-        OVXMessageUtil.untranslateXidAndSend(this, sw);
+        //OVXMessageUtil.untranslateXidAndSend(this, sw);
+        // SJM NIaaS
+        if (this.getVendor() == OFEnslabVendorData.ENSLAB_VENDOR_ID) {
+	        OFVendorData vendorData = this.getVendorData();
+	        if (vendorData instanceof OFMarkerReplyVendorData) {
+	        	OFMarkerReplyVendorData markerReply = (OFMarkerReplyVendorData) vendorData;
+	        	sw.setMarkerStatistics(markerReply.getMarkerId(), markerReply);
+	        }
+        } else {
+        	OVXMessageUtil.untranslateXidAndSend(this, sw);
+        }
+        // SJM NIaaS END
     }
 
 }

@@ -21,8 +21,10 @@ import java.util.concurrent.TimeUnit;
 import net.onrc.openvirtex.core.OpenVirteXController;
 import net.onrc.openvirtex.core.io.OVXSendMsg;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
+import net.onrc.openvirtex.elements.marker.Marker;
 import net.onrc.openvirtex.elements.network.PhysicalNetwork;
 import net.onrc.openvirtex.messages.OVXStatisticsRequest;
+import net.onrc.openvirtex.messages.OVXVendor;
 import net.onrc.openvirtex.messages.statistics.OVXFlowStatisticsRequest;
 import net.onrc.openvirtex.messages.statistics.OVXPortStatisticsRequest;
 import net.onrc.openvirtex.protocol.OVXMatch;
@@ -36,6 +38,8 @@ import org.openflow.protocol.OFMessage;
 import org.openflow.protocol.OFPort;
 import org.openflow.protocol.Wildcards;
 import org.openflow.protocol.statistics.OFStatisticsType;
+import org.openflow.vendor.enslab.OFEnslabVendorData;
+import org.openflow.vendor.enslab.OFMarkerRequestVendorData;
 
 public class StatisticsManager implements TimerTask, OVXSendMsg {
 
@@ -62,7 +66,10 @@ public class StatisticsManager implements TimerTask, OVXSendMsg {
         log.debug("Collecting stats for {}", this.sw.getSwitchName());
         sendPortStatistics();
         sendFlowStatistics(0, (short) 0);
-
+        // SJM NIaaS: Collect marker statistics
+        sendMarkerStatistics();
+        // SJM NIaaS END
+        
         if (!this.stopTimer) {
             log.debug("Scheduling stats collection in {} seconds for {}",
                     this.refreshInterval, this.sw.getSwitchName());
@@ -97,6 +104,22 @@ public class StatisticsManager implements TimerTask, OVXSendMsg {
         req.setLengthU(req.getLengthU() + preq.getLength());
         sendMsg(req, this);
     }
+    
+    // SJM NIaaS: Send marker statistics request
+    private void sendMarkerStatistics() {
+    	Marker[] marker = this.sw.getAllMarkers();
+    	for (int i = 0; i < marker.length; i++) {
+	    	OVXVendor req = new OVXVendor();
+	    	OFMarkerRequestVendorData mreq = new OFMarkerRequestVendorData();
+	    	mreq.setDataType(OFMarkerRequestVendorData.ENSLAB_MARKER_STATS_REQUEST);
+	    	mreq.setMarkerId(marker[i].getMarkerId());
+	    	req.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
+	    	req.setVendorData(mreq);
+	    	req.setLengthU(req.getLengthU() + mreq.getLength());
+	    	sendMsg(req, this);
+    	}
+    }
+    // SJM NIaaS END
 
     public void start() {
 

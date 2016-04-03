@@ -30,7 +30,7 @@ public class OFMarkerReplyVendorData extends OFEnslabVendorData {
 	}
 	
 	public void setDataType(final int dataType) {
-		this.setDataType(dataType);
+		super.setDataType(dataType);
 	} 
 	
 	public void setMarkerId(final int markerId) {

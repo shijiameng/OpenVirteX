@@ -40,6 +40,7 @@ import net.onrc.openvirtex.elements.datapath.Switch;
 import net.onrc.openvirtex.elements.host.Host;
 import net.onrc.openvirtex.elements.link.OVXLink;
 import net.onrc.openvirtex.elements.link.PhysicalLink;
+import net.onrc.openvirtex.elements.marker.SrtcMarker;
 import net.onrc.openvirtex.elements.port.OVXPort;
 import net.onrc.openvirtex.elements.port.PhysicalPort;
 import net.onrc.openvirtex.exceptions.DuplicateIndexException;
@@ -90,13 +91,12 @@ public class OVXNetwork extends Network<OVXSwitch, OVXPort, OVXLink> implements
     private final OVXFlowManager flowManager;
     
     // SJM NIaaS: Parameters of srTCM and Type of Service
-    private final Integer ctdInfoRate;  // Committed Information Rate (CIR)
-    private final Long ctdBurstSize;	// Committed Burst Size (CBS)
-    private final Long exdBurstSize;	// Exceed Burst Size (EBS)
-    private final TypeOfService typeOfService;	
-    private final List<PhysicalSwitch> mappedPhysicalSwitch;
+    private final Integer committedInfoRate;  // Committed Information Rate (CIR)
+    private final Long committedBurstSize;	// Committed Burst Size (CBS)
+    private final Long exceedBurstSize;	// Exceed Burst Size (EBS)
+    private final TypeOfService typeOfService;
     // SJM NIaaS END
-
+    
     /**
      * Instantiates a virtual network. Only use if you have reserved the tenantId
      * beforehand!
@@ -131,11 +131,10 @@ public class OVXNetwork extends Network<OVXSwitch, OVXPort, OVXLink> implements
                 this.hostMap.values());
         
         // SJM NIaaS: Initialize parameters of srTCM
-        this.ctdInfoRate = CIR;
-        this.ctdBurstSize = CBS;
-        this.exdBurstSize = EBS;
+        this.committedInfoRate = CIR;
+        this.committedBurstSize = CBS;
+        this.exceedBurstSize = EBS;
         this.typeOfService = tos;
-        this.mappedPhysicalSwitch = new ArrayList<PhysicalSwitch>();
         // SJM NIaaS END
     }
 
@@ -169,15 +168,15 @@ public class OVXNetwork extends Network<OVXSwitch, OVXPort, OVXLink> implements
     }
     
     public Integer getCIR() {
-    	return this.ctdInfoRate;
+    	return this.committedInfoRate;
     }
     
     public Long getCBS() {
-    	return this.ctdBurstSize;
+    	return this.committedBurstSize;
     }
     
     public Long getEBS() {
-    	return this.exdBurstSize;
+    	return this.exceedBurstSize;
     }
     // SJM NIaaS END
 
@@ -291,11 +290,6 @@ public class OVXNetwork extends Network<OVXSwitch, OVXPort, OVXLink> implements
         for (final OVXSwitch sw : this.getSwitches()) {
             sw.tearDown();
         }
-        // SJM NIaaS: Remove marker from datapath
-        for (final PhysicalSwitch sw : this.mappedPhysicalSwitch) {
-        	sw.removeMarker(this.tenantId);
-        }
-        // SJM NIaaS END
         this.isBooted = false;
     }
 
@@ -321,19 +315,23 @@ public class OVXNetwork extends Network<OVXSwitch, OVXPort, OVXLink> implements
         // TODO: check if dpids are present in physical network
         for (final long dpid : dpids) {
             switches.add(PhysicalNetwork.getInstance().getSwitch(dpid));
-            // SJM NIaaS
-            PhysicalSwitch sw = PhysicalNetwork.getInstance().getSwitch(dpid);
-            this.mappedPhysicalSwitch.add(sw);
-            // SJM NIaaS END
         }
         if (dpids.size() == 1) {
             virtualSwitch = new OVXSingleSwitch(switchId, this.tenantId);
+            // SJM NIaaS: Add a marker to this OVXSwitch (Single Switch is considered only)
+            PhysicalSwitch phySwitch = PhysicalNetwork.getInstance().getSwitch(dpids.get(0));
+            SrtcMarker marker = new SrtcMarker(this.tenantId, phySwitch);
+            marker.setCommittedBurstSize(this.committedBurstSize);
+            marker.setCommittedInfoRate(this.committedInfoRate);
+            marker.setExceedBurstSize(this.exceedBurstSize);
+            virtualSwitch.setMarker(marker);
+            // SJM NIaaS END
         } else {
             virtualSwitch = new OVXBigSwitch(switchId, this.tenantId);
         }
         // Add switch to topology and register it in the map
         this.addSwitch(virtualSwitch);
-
+        
         virtualSwitch.register(switches);
         if (this.isBooted) {
             virtualSwitch.boot();
@@ -675,11 +673,7 @@ public class OVXNetwork extends Network<OVXSwitch, OVXPort, OVXLink> implements
         for (final OVXSwitch sw : this.getSwitches()) {
             result &= sw.boot();
         }
-        // SJM NIaaS: Install markers (srTCM) into physical datapath when boot a OVXNetwork
-        for (final PhysicalSwitch sw : this.mappedPhysicalSwitch) {
-        	sw.installMarker(this);
-        }
-        // SJM NIaaS END
+        
         this.isBooted = result;
         return this.isBooted;
     }

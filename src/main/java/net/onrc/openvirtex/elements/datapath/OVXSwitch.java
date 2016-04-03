@@ -35,6 +35,7 @@ import java.util.TreeSet;
 import net.onrc.openvirtex.elements.datapath.role.RoleManager;
 import net.onrc.openvirtex.elements.datapath.role.RoleManager.Role;
 import net.onrc.openvirtex.elements.host.Host;
+import net.onrc.openvirtex.elements.marker.Marker;
 import net.onrc.openvirtex.elements.network.OVXNetwork;
 import net.onrc.openvirtex.elements.port.OVXPort;
 import net.onrc.openvirtex.exceptions.ControllerStateException;
@@ -98,6 +99,9 @@ public abstract class OVXSwitch extends Switch<OVXPort> implements Persistable {
      * the current role of a controller.
      */
     private final RoleManager roleMan;
+    // SJM NIaaS
+    private Marker marker;
+    // SJM NIaaS END
 
     /**
      * Instantiates a new OVX switch.
@@ -120,8 +124,20 @@ public abstract class OVXSwitch extends Switch<OVXPort> implements Persistable {
         this.flowTable = new OVXFlowTable(this);
         this.roleMan = new RoleManager();
         this.channelMux = new XidTranslator<Channel>();        
+        // SJM NIaaS
+        this.marker = null;
+        // SJM NIaaS END
     }
 
+    // SJM NIaaS
+    public void setMarker(Marker marker) {
+    	this.marker = marker;
+    }
+    
+    public Marker getMarker() {
+    	return this.marker;
+    }
+    // SJM NIaaS END
     /**
      * Gets the tenant id.
      *
@@ -357,6 +373,12 @@ public abstract class OVXSwitch extends Switch<OVXPort> implements Persistable {
                 p.tearDown();
             }
         }
+        
+        // SJM NIaaS: Tear down the marker when tearing down this OVSwitch
+        if (this.marker != null) {
+        	this.marker.tearDown();
+        }
+        // SJM NIaaS END
 
     }
 
@@ -417,6 +439,11 @@ public abstract class OVXSwitch extends Switch<OVXPort> implements Persistable {
                 p.boot();
             }
         }
+        // SJM NIaaS: Boot the marker when booting this OVXSwitch
+        if (this.marker != null) {
+        	this.marker.boot();
+        }
+        // SJM NIaaS END
         return true;
     }
 
