@@ -7,6 +7,13 @@ public class OFEnslabVendorData implements OFVendorData {
 	
 	public static final int ENSLAB_VENDOR_ID = 0xff001021;
 	
+	public static final int ENSLAB_MARKER_ADD = 100;
+	public static final int ENSLAB_MARKER_REMOVE = 101;
+	public static final int ENSLAB_MARKER_FEATURES_REQUEST = 102;
+	public static final int ENSLAB_MARKER_FEATURES_REPLY = 103;
+	public static final int ENSLAB_MARKER_STATS_REQUEST = 104;
+	public static final int ENSLAB_MARKER_STATS_REPLY = 105;
+	
 	protected int dataType;
 	
 	public OFEnslabVendorData() {

@@ -1,10 +1,14 @@
 package org.openflow.vendor.enslab;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.protocol.Instantiable;
 import org.openflow.protocol.vendor.OFVendorData;
 
 public class OFMarkerReplyVendorData extends OFEnslabVendorData {
+	Logger log = LogManager.getLogger(OFMarkerReplyVendorData.class.getName());
+	
 	protected static Instantiable<OFVendorData> instantiable = new Instantiable<OFVendorData>() {
         @Override
         public OFVendorData instantiate() {
@@ -21,6 +25,7 @@ public class OFMarkerReplyVendorData extends OFEnslabVendorData {
     
 	protected int markerId;
 	protected OFMarkerType markerType;
+	protected OFMarkerReply reply;
 	
 	public OFMarkerReplyVendorData() {	
 	}
@@ -53,6 +58,10 @@ public class OFMarkerReplyVendorData extends OFEnslabVendorData {
 		return this.markerType;
 	}
 	
+	public OFMarkerReply getReply() {
+		return reply;
+	}
+	
 	@Override
     public int getLength() {
         return super.getLength() + 8;
@@ -63,7 +72,10 @@ public class OFMarkerReplyVendorData extends OFEnslabVendorData {
         super.readFrom(data, length);
         this.markerId = data.readInt();
         this.markerType = OFMarkerType.valueOf(data.readInt());
-        data.readInt();
+        if (this.markerType == OFMarkerType.ENSLAB_MARKER_SRTC) {
+        	this.reply = this.markerType.newInstance(this.getDataType());
+        }
+        this.reply.readFrom(data);
     }
 
     @Override
@@ -71,5 +83,6 @@ public class OFMarkerReplyVendorData extends OFEnslabVendorData {
         super.writeTo(data);
         data.writeInt(this.markerId);
         data.writeInt(this.markerType.value());
+        reply.writeTo(data);
     }
 }

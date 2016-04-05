@@ -2,14 +2,10 @@ package org.openflow.vendor.enslab;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
-public class OFSrtcmFeaturesReplyVendorData extends OFMarkerReplyVendorData {
+public class OFSrtcmFeaturesReply implements OFMarkerReply {
     
     protected int CIR;
     protected long CBS, EBS;
-    
-    public OFSrtcmFeaturesReplyVendorData() {
-    	super.setDataType(OFMarkerReplyVendorData.ENSLAB_MARKER_FEATURES_REPLY);
-    }
     
     public void setCIR(final int CIR) {
     	this.CIR = CIR;
@@ -37,12 +33,11 @@ public class OFSrtcmFeaturesReplyVendorData extends OFMarkerReplyVendorData {
     
     @Override
     public int getLength() {
-        return super.getLength() + 24;
+        return 24;
     }
 
     @Override
-    public void readFrom(final ChannelBuffer data, final int length) {
-        super.readFrom(data, length);
+    public void readFrom(final ChannelBuffer data) {
         this.CIR = data.readInt();
         data.readInt();
         this.CBS = data.readLong();
@@ -51,7 +46,6 @@ public class OFSrtcmFeaturesReplyVendorData extends OFMarkerReplyVendorData {
 
     @Override
     public void writeTo(final ChannelBuffer data) {
-        super.writeTo(data);
         data.writeInt(this.CIR);
         data.writeInt(0);
         data.writeLong(this.CBS);

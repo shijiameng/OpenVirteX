@@ -46,6 +46,7 @@ import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
+import org.openflow.vendor.enslab.OFEnslabVendorExtensions;
 import org.openflow.vendor.nicira.OFNiciraVendorExtensions;
 
 public class OpenVirteXController implements Runnable {
@@ -287,6 +288,9 @@ public class OpenVirteXController implements Runnable {
         // Configure openflowj to be able to parse the role request/reply
         // vendor messages.
         OFNiciraVendorExtensions.initialize();
+        // SJM NIaaS: Initialize ENSLAB vendor messages
+        OFEnslabVendorExtensions.initialize();
+        // SJM NIaaS END
 
     }
 

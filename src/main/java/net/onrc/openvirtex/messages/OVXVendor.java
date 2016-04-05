@@ -17,15 +17,19 @@ package net.onrc.openvirtex.messages;
 
 import net.onrc.openvirtex.elements.datapath.OVXSwitch;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openflow.protocol.OFVendor;
-import org.openflow.protocol.vendor.OFVendorData;
 import org.openflow.vendor.enslab.OFEnslabVendorData;
 import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
+import org.openflow.vendor.enslab.OFMarkerType;
+import org.openflow.vendor.enslab.OFSrtcmStatsReply;
 
 public class OVXVendor extends OFVendor implements Virtualizable,
         Devirtualizable {
-
+	
+	Logger log = LogManager.getLogger(OVXVendor.class.getName());
+	
     @Override
     public void devirtualize(final OVXSwitch sw) {
         OVXMessageUtil.translateXidAndSend(this, sw);
@@ -33,13 +37,31 @@ public class OVXVendor extends OFVendor implements Virtualizable,
 
     @Override
     public void virtualize(final PhysicalSwitch sw) {
-        //OVXMessageUtil.untranslateXidAndSend(this, sw);
+        //Commented by SJM: OVXMessageUtil.untranslateXidAndSend(this, sw);
         // SJM NIaaS
         if (this.getVendor() == OFEnslabVendorData.ENSLAB_VENDOR_ID) {
-	        OFVendorData vendorData = this.getVendorData();
-	        if (vendorData instanceof OFMarkerReplyVendorData) {
-	        	OFMarkerReplyVendorData markerReply = (OFMarkerReplyVendorData) vendorData;
-	        	sw.setMarkerStatistics(markerReply.getMarkerId(), markerReply);
+	        OFEnslabVendorData vendorData = (OFEnslabVendorData) this.getVendorData();
+        	switch (vendorData.getDataType()) {
+        	case OFEnslabVendorData.ENSLAB_MARKER_ADD:
+        	case OFEnslabVendorData.ENSLAB_MARKER_REMOVE:
+        	case OFEnslabVendorData.ENSLAB_MARKER_FEATURES_REQUEST:
+        	case OFEnslabVendorData.ENSLAB_MARKER_STATS_REQUEST:
+        		// here should not be reached forever
+        		break;
+        		
+        	case OFEnslabVendorData.ENSLAB_MARKER_FEATURES_REPLY:
+        		break;
+        		
+        	case OFEnslabVendorData.ENSLAB_MARKER_STATS_REPLY:
+        		OFMarkerReplyVendorData statsReply = (OFMarkerReplyVendorData) vendorData;
+	        	if (statsReply.getMarkerType() == OFMarkerType.ENSLAB_MARKER_SRTC) {
+	        		OFSrtcmStatsReply srtcmStatsReply = (OFSrtcmStatsReply) statsReply.getReply();
+	        		log.info(srtcmStatsReply.toString());
+	        	}
+        		break;
+        		
+	        default:
+	        	break;
 	        }
         } else {
         	OVXMessageUtil.untranslateXidAndSend(this, sw);

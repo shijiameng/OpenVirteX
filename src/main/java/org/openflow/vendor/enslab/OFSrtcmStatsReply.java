@@ -2,7 +2,7 @@ package org.openflow.vendor.enslab;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
-public class OFSrtcmStatsReplyVendorData extends OFMarkerReplyVendorData {
+public class OFSrtcmStatsReply implements OFMarkerReply {
     
     protected long nPackets, nBytes;
     protected long nGreenPackets, nGreenBytes;
@@ -10,11 +10,6 @@ public class OFSrtcmStatsReplyVendorData extends OFMarkerReplyVendorData {
     protected long nRedPackets, nRedBytes;
     protected long nCTokens, nETokens;
 
-    public OFSrtcmStatsReplyVendorData() {
-    	super.setDataType(OFMarkerReplyVendorData.ENSLAB_MARKER_STATS_REPLY);
-    	super.setMarkerType(OFMarkerType.ENSLAB_MARKER_SRTC);
-    }
-    
     public void setNumberOfPackets(final long nPackets) {
     	this.nPackets = nPackets;
     }
@@ -97,12 +92,11 @@ public class OFSrtcmStatsReplyVendorData extends OFMarkerReplyVendorData {
     
     @Override
     public int getLength() {
-        return super.getLength() + 80;
+        return 80;
     }
 
     @Override
-    public void readFrom(final ChannelBuffer data, final int length) {
-        super.readFrom(data, length);
+    public void readFrom(final ChannelBuffer data) {
         this.nPackets = data.readLong();
         this.nBytes = data.readLong();
         this.nGreenPackets = data.readLong();
@@ -117,7 +111,6 @@ public class OFSrtcmStatsReplyVendorData extends OFMarkerReplyVendorData {
 
     @Override
     public void writeTo(final ChannelBuffer data) {
-        super.writeTo(data);
         data.writeLong(this.nPackets);
         data.writeLong(this.nBytes);
         data.writeLong(this.nGreenPackets);
@@ -128,5 +121,13 @@ public class OFSrtcmStatsReplyVendorData extends OFMarkerReplyVendorData {
         data.writeLong(this.nRedBytes);
         data.writeLong(this.nCTokens);
         data.writeLong(this.nETokens);
+    }
+    
+    @Override
+    public String toString() {
+    	return "nPackets: " + this.nPackets + " nBytes: " + this.nBytes + "\n" +
+    			"nGreenPackets: " + this.nGreenPackets + " nGreenBytes: " + this.nGreenBytes + "\n" +
+    			"nYellowPackets: " + this.nYellowPackets + " nYellowBytes: " + this.nYellowBytes + "\n" +
+    			"nRedPackets: " + this.nRedPackets + " nRedBytes: " + this.nRedBytes + "\n";
     }
 }
