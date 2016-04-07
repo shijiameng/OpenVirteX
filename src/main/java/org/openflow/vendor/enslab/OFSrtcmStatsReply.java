@@ -9,6 +9,7 @@ public class OFSrtcmStatsReply implements OFMarkerReply {
     protected long nYellowPackets, nYellowBytes;
     protected long nRedPackets, nRedBytes;
     protected long nCTokens, nETokens;
+    protected long nCBorrowed, nEBorrowed;
 
     public void setNumberOfPackets(final long nPackets) {
     	this.nPackets = nPackets;
@@ -92,7 +93,7 @@ public class OFSrtcmStatsReply implements OFMarkerReply {
     
     @Override
     public int getLength() {
-        return 80;
+        return 96;
     }
 
     @Override
@@ -107,6 +108,8 @@ public class OFSrtcmStatsReply implements OFMarkerReply {
         this.nRedBytes = data.readLong();
         this.nCTokens = data.readLong();
         this.nETokens = data.readLong();
+        this.nCBorrowed = data.readLong();
+        this.nEBorrowed = data.readLong();
     }
 
     @Override
@@ -121,6 +124,8 @@ public class OFSrtcmStatsReply implements OFMarkerReply {
         data.writeLong(this.nRedBytes);
         data.writeLong(this.nCTokens);
         data.writeLong(this.nETokens);
+        data.writeLong(this.nCBorrowed);
+        data.writeLong(this.nEBorrowed);
     }
     
     @Override
@@ -128,6 +133,8 @@ public class OFSrtcmStatsReply implements OFMarkerReply {
     	return "nPackets: " + this.nPackets + " nBytes: " + this.nBytes + "\n" +
     			"nGreenPackets: " + this.nGreenPackets + " nGreenBytes: " + this.nGreenBytes + "\n" +
     			"nYellowPackets: " + this.nYellowPackets + " nYellowBytes: " + this.nYellowBytes + "\n" +
-    			"nRedPackets: " + this.nRedPackets + " nRedBytes: " + this.nRedBytes + "\n";
+    			"nRedPackets: " + this.nRedPackets + " nRedBytes: " + this.nRedBytes + "\n" +
+    			"nCTokens: " + this.nCTokens + " nETokens: " + this.nETokens + "\n" +
+    			"nCBorrowed: " + this.nCBorrowed + " nEBorrowed: " + this.nEBorrowed + "\n";
     }
 }

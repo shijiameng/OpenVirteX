@@ -15,8 +15,6 @@
  ******************************************************************************/
 package net.onrc.openvirtex.messages;
 
-import net.onrc.openvirtex.elements.datapath.OVXSwitch;
-import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openflow.protocol.OFVendor;
@@ -25,10 +23,13 @@ import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
 import org.openflow.vendor.enslab.OFMarkerType;
 import org.openflow.vendor.enslab.OFSrtcmStatsReply;
 
+import net.onrc.openvirtex.elements.datapath.OVXSwitch;
+import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
+
 public class OVXVendor extends OFVendor implements Virtualizable,
         Devirtualizable {
 	
-	Logger log = LogManager.getLogger(OVXVendor.class.getName());
+	static Logger log = LogManager.getLogger(OVXVendor.class.getName());
 	
     @Override
     public void devirtualize(final OVXSwitch sw) {
@@ -47,6 +48,7 @@ public class OVXVendor extends OFVendor implements Virtualizable,
         	case OFEnslabVendorData.ENSLAB_MARKER_FEATURES_REQUEST:
         	case OFEnslabVendorData.ENSLAB_MARKER_STATS_REQUEST:
         		// here should not be reached forever
+        		OVXVendor.log.fatal("Received invalid message - {}", vendorData.getDataType());
         		break;
         		
         	case OFEnslabVendorData.ENSLAB_MARKER_FEATURES_REPLY:
@@ -56,7 +58,7 @@ public class OVXVendor extends OFVendor implements Virtualizable,
         		OFMarkerReplyVendorData statsReply = (OFMarkerReplyVendorData) vendorData;
 	        	if (statsReply.getMarkerType() == OFMarkerType.ENSLAB_MARKER_SRTC) {
 	        		OFSrtcmStatsReply srtcmStatsReply = (OFSrtcmStatsReply) statsReply.getReply();
-	        		log.info(srtcmStatsReply.toString());
+	        		OVXVendor.log.info(srtcmStatsReply.toString());
 	        	}
         		break;
         		

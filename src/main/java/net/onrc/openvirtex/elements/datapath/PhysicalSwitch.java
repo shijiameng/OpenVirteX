@@ -29,6 +29,7 @@ import net.onrc.openvirtex.elements.port.PhysicalPort;
 import net.onrc.openvirtex.exceptions.SwitchMappingException;
 import net.onrc.openvirtex.messages.OVXFlowMod;
 import net.onrc.openvirtex.messages.OVXStatisticsReply;
+import net.onrc.openvirtex.messages.OVXVendor;
 import net.onrc.openvirtex.messages.Virtualizable;
 import net.onrc.openvirtex.messages.statistics.OVXFlowStatisticsReply;
 import net.onrc.openvirtex.messages.statistics.OVXPortStatisticsReply;
@@ -36,12 +37,16 @@ import net.onrc.openvirtex.messages.statistics.OVXPortStatisticsReply;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jboss.netty.channel.Channel;
+import org.openflow.protocol.OFMarker;
 import org.openflow.protocol.OFMessage;
 import org.openflow.protocol.OFPhysicalPort;
 import org.openflow.protocol.OFPort;
 import org.openflow.protocol.OFVendor;
 import org.openflow.protocol.statistics.OFStatistics;
+import org.openflow.vendor.enslab.OFEnslabVendorData;
+import org.openflow.vendor.enslab.OFMarkerAddVendorData;
 import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
+import org.openflow.vendor.enslab.OFMarkerType;
 
 /**
  * The Class PhysicalSwitch.
@@ -223,6 +228,16 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         this.fillPortMap();
         this.statsMan.start();
         
+        // SJM NIaaS: Add a global marker when booting this switch
+        OVXVendor vendor = new OVXVendor();
+        OFMarkerAddVendorData vendorData = new OFMarkerAddVendorData();
+        vendorData.setMarkerType(OFMarkerType.ENSLAB_MARKER_SRTC.value());
+        vendorData.setMarkerId(OFMarker.OFPM_GLOBAL.getValue());
+        vendor.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
+        vendor.setVendorData(vendorData);
+        vendor.setLengthU(OVXVendor.MINIMUM_LENGTH + vendorData.getLength());
+        this.sendMsg(vendor, this);
+        // SJM NIaaS END
         return true;
     }
     
