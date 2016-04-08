@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timeout;
 import org.jboss.netty.util.TimerTask;
+import org.openflow.protocol.OFMarker;
 import org.openflow.protocol.OFMessage;
 import org.openflow.protocol.OFPort;
 import org.openflow.protocol.Wildcards;
@@ -107,15 +108,20 @@ public class StatisticsManager implements TimerTask, OVXSendMsg {
     
     // SJM NIaaS: Send marker statistics request
     private void sendMarkerStatistics() {
+    	OVXVendor req = new OVXVendor();
+    	OFMarkerRequestVendorData mreq = new OFMarkerRequestVendorData();
     	Marker[] marker = this.sw.getAllMarkers();
+    	
+    	mreq.setDataType(OFMarkerRequestVendorData.ENSLAB_MARKER_STATS_REQUEST);
+    	req.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
+    	req.setLengthU(req.getLengthU() + mreq.getLength());
+    	req.setVendorData(mreq);
+    	
+    	mreq.setMarkerId(OFMarker.OFPM_GLOBAL.getValue());
+    	sendMsg(req, this);
+    	
     	for (int i = 0; i < marker.length; i++) {
-	    	OVXVendor req = new OVXVendor();
-	    	OFMarkerRequestVendorData mreq = new OFMarkerRequestVendorData();
-	    	mreq.setDataType(OFMarkerRequestVendorData.ENSLAB_MARKER_STATS_REQUEST);
 	    	mreq.setMarkerId(marker[i].getMarkerId());
-	    	req.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
-	    	req.setVendorData(mreq);
-	    	req.setLengthU(req.getLengthU() + mreq.getLength());
 	    	sendMsg(req, this);
     	}
     }

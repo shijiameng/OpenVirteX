@@ -25,7 +25,7 @@ public class OFMarkerReplyVendorData extends OFEnslabVendorData {
     
 	protected int markerId;
 	protected OFMarkerType markerType;
-	protected OFMarkerReply reply;
+	protected OFMarkerData reply;
 	
 	public OFMarkerReplyVendorData() {	
 	}
@@ -58,7 +58,7 @@ public class OFMarkerReplyVendorData extends OFEnslabVendorData {
 		return this.markerType;
 	}
 	
-	public OFMarkerReply getReply() {
+	public OFMarkerData getReply() {
 		return reply;
 	}
 	

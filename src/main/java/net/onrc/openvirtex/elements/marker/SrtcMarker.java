@@ -3,11 +3,13 @@ package net.onrc.openvirtex.elements.marker;
 import org.openflow.protocol.OFMessage;
 import org.openflow.protocol.OFVendor;
 import org.openflow.vendor.enslab.OFEnslabVendorData;
+import org.openflow.vendor.enslab.OFMarkerAddVendorData;
 import org.openflow.vendor.enslab.OFMarkerRemoveVendorData;
-import org.openflow.vendor.enslab.OFSrtcmAddVendorData;
-
+import org.openflow.vendor.enslab.OFMarkerType;
+import org.openflow.vendor.enslab.OFSrtcmFeatures;
 import net.onrc.openvirtex.core.io.OVXSendMsg;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
+import net.onrc.openvirtex.elements.network.TypeOfService;
 import net.onrc.openvirtex.messages.OVXVendor;
 
 public class SrtcMarker extends Marker {
@@ -18,8 +20,13 @@ public class SrtcMarker extends Marker {
 	
 	protected long exceedBurstSize;
 	
-	public SrtcMarker(final int markerId, PhysicalSwitch sw) {
+	protected double cTokenPenalty, eTokenPenalty;
+	
+	
+	public SrtcMarker(final int markerId, PhysicalSwitch sw, final TypeOfService toS) {
 		super(markerId, sw);
+		super.setMarkerType(OFMarkerType.ENSLAB_MARKER_SRTC);
+		this.toS = toS;
 	}
 	
 	public void setCommittedInfoRate(final int CIR) {
@@ -45,17 +52,42 @@ public class SrtcMarker extends Marker {
 	public long getExceedBurstSize() {
 		return this.exceedBurstSize;
 	}
+	
+	public void setCTokenPenalty(final double penalty) {
+		this.cTokenPenalty = penalty;
+	}
+	
+	public double getCTokenPenalty() {
+		return this.cTokenPenalty;
+	}
+	
+	public void setETokenPenalty(final double penalty) {
+		this.eTokenPenalty = penalty;
+	}
+	
+	public double getETokenPenalty() {
+		return this.eTokenPenalty;
+	}
 
 	@Override
 	public void boot() {
 		OVXVendor vendor = new OVXVendor();
-		OFSrtcmAddVendorData request = new OFSrtcmAddVendorData(this.markerId);
-		vendor.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
-		vendor.setVendorData(request);
-        vendor.setLengthU(OFVendor.MINIMUM_LENGTH + request.getLength());
-        request.setCBS(this.committedBurstSize);
-        request.setCIR(this.committedInfoRate);
-        request.setEBS(this.exceedBurstSize);
+		OFMarkerAddVendorData vendorData = new OFMarkerAddVendorData();
+		OFSrtcmFeatures srtcmFeatures = new OFSrtcmFeatures();
+		
+		srtcmFeatures.setCIR(this.committedInfoRate);
+		srtcmFeatures.setCBS(this.committedBurstSize);
+		srtcmFeatures.setEBS(this.exceedBurstSize);
+		srtcmFeatures.setCBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_MAX);
+		srtcmFeatures.setEBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_MAX);
+		
+		vendorData.setMarkerType(OFMarkerType.ENSLAB_MARKER_SRTC);
+		vendorData.setMarkerId(this.markerId);
+		vendorData.setMarkerData(srtcmFeatures);
+		
+		vendor.setVendorData(vendorData);
+		vendor.setLengthU(OVXVendor.MINIMUM_LENGTH + vendorData.getLength());
+		
         sendMsg(vendor, this);
         isBooted = true;
 	}
@@ -83,4 +115,5 @@ public class SrtcMarker extends Marker {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }

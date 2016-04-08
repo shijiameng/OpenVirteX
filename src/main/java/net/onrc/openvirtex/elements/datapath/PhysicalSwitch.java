@@ -47,6 +47,7 @@ import org.openflow.vendor.enslab.OFEnslabVendorData;
 import org.openflow.vendor.enslab.OFMarkerAddVendorData;
 import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
 import org.openflow.vendor.enslab.OFMarkerType;
+import org.openflow.vendor.enslab.OFSrtcmFeatures;
 
 /**
  * The Class PhysicalSwitch.
@@ -231,8 +232,18 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         // SJM NIaaS: Add a global marker when booting this switch
         OVXVendor vendor = new OVXVendor();
         OFMarkerAddVendorData vendorData = new OFMarkerAddVendorData();
-        vendorData.setMarkerType(OFMarkerType.ENSLAB_MARKER_SRTC.value());
+        OFSrtcmFeatures srtcmFeatures = new OFSrtcmFeatures();
+        
+        srtcmFeatures.setCIR(0);
+        srtcmFeatures.setCBS(0);
+        srtcmFeatures.setEBS(0);
+        srtcmFeatures.setCBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_NA);
+        srtcmFeatures.setEBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_NA);
+        
+        vendorData.setMarkerType(OFMarkerType.ENSLAB_MARKER_SRTC);
         vendorData.setMarkerId(OFMarker.OFPM_GLOBAL.getValue());
+        vendorData.setMarkerData(srtcmFeatures);
+        
         vendor.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
         vendor.setVendorData(vendorData);
         vendor.setLengthU(OVXVendor.MINIMUM_LENGTH + vendorData.getLength());

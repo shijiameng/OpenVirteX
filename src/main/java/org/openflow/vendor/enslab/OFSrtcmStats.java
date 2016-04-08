@@ -2,7 +2,7 @@ package org.openflow.vendor.enslab;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
-public class OFSrtcmStatsReply implements OFMarkerReply {
+public class OFSrtcmStats implements OFMarkerData {
     
     protected long nPackets, nBytes;
     protected long nGreenPackets, nGreenBytes;
@@ -91,6 +91,22 @@ public class OFSrtcmStatsReply implements OFMarkerReply {
     	return this.nETokens;
     }
     
+    public long getNumberOfCBorrowed() {
+    	return this.nCBorrowed;
+    }
+    
+    public void setNumberOfCBorrowed(final long nTokens) {
+    	this.nCBorrowed = nTokens;
+    }
+    
+    public long getNumberOfEBorrowed() {
+    	return this.nEBorrowed;
+    }
+    
+    public void setNumberOfEBorrowed(final long nTokens) {
+    	this.nEBorrowed = nTokens;
+    }
+    
     @Override
     public int getLength() {
         return 96;
@@ -130,11 +146,11 @@ public class OFSrtcmStatsReply implements OFMarkerReply {
     
     @Override
     public String toString() {
-    	return "nPackets: " + this.nPackets + " nBytes: " + this.nBytes + "\n" +
-    			"nGreenPackets: " + this.nGreenPackets + " nGreenBytes: " + this.nGreenBytes + "\n" +
-    			"nYellowPackets: " + this.nYellowPackets + " nYellowBytes: " + this.nYellowBytes + "\n" +
-    			"nRedPackets: " + this.nRedPackets + " nRedBytes: " + this.nRedBytes + "\n" +
-    			"nCTokens: " + this.nCTokens + " nETokens: " + this.nETokens + "\n" +
-    			"nCBorrowed: " + this.nCBorrowed + " nEBorrowed: " + this.nEBorrowed + "\n";
+    	return "n_packets: " + this.nPackets + ", n_bytes: " + this.nBytes +
+    			", n_g_packets: " + this.nGreenPackets + ", n_g_bytes: " + this.nGreenBytes  +
+    			", n_y_packets: " + this.nYellowPackets + ", n_y_bytes: " + this.nYellowBytes +
+    			", n_r_packets: " + this.nRedPackets + ", n_r_bytes: " + this.nRedBytes +
+    			", n_c_tokens: " + this.nCTokens + ", n_e_tokens: " + this.nETokens +
+    			", n_c_borrowed: " + this.nCBorrowed + ", n_e_borrowed: " + this.nEBorrowed;
     }
 }

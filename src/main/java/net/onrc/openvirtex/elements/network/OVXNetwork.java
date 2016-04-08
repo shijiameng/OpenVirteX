@@ -320,7 +320,7 @@ public class OVXNetwork extends Network<OVXSwitch, OVXPort, OVXLink> implements
             virtualSwitch = new OVXSingleSwitch(switchId, this.tenantId);
             // SJM NIaaS: Add a marker to this OVXSwitch (Single Switch is considered only)
             PhysicalSwitch phySwitch = PhysicalNetwork.getInstance().getSwitch(dpids.get(0));
-            SrtcMarker marker = new SrtcMarker(this.tenantId, phySwitch);
+            SrtcMarker marker = new SrtcMarker(this.tenantId, phySwitch, this.typeOfService);
             marker.setCommittedBurstSize(this.committedBurstSize);
             marker.setCommittedInfoRate(this.committedInfoRate);
             marker.setExceedBurstSize(this.exceedBurstSize);

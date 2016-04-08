@@ -2,17 +2,27 @@ package net.onrc.openvirtex.elements.marker;
 
 import java.util.Map;
 
+import org.openflow.vendor.enslab.OFMarkerType;
+
 import net.onrc.openvirtex.core.io.OVXSendMsg;
 import net.onrc.openvirtex.elements.Persistable;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
+import net.onrc.openvirtex.elements.network.TypeOfService;
 
 public abstract class Marker implements Persistable, OVXSendMsg {
 	
 	public static final String DB_KEY = "markers";
 	
 	protected int markerId;
+	protected OFMarkerType type;
+	
+	protected TypeOfService toS;
+	protected int currentBandwidth;
+	protected double weight;
+		
 	protected PhysicalSwitch parentSwitch;
 	protected boolean isBooted;
+	
 	
 	protected Marker() {
 		isBooted = false;
@@ -33,12 +43,44 @@ public abstract class Marker implements Persistable, OVXSendMsg {
 		parentSwitch.addMarker(this);
 	}
 	
+	public void setMarkerType(final OFMarkerType type) {
+		this.type = type;
+	}
+	
 	public int getMarkerId() {
 		return this.markerId;
 	}
 	
+	public OFMarkerType getMarkerType() {
+		return this.type;
+	}
+	
 	public PhysicalSwitch getSwitch() {
 		return this.parentSwitch;
+	}
+	
+	public void setCurrentBandwidth(final int currentBandwidth) {
+		this.currentBandwidth = currentBandwidth;
+	}
+	
+	public int getCurrentBandwidth() {
+		return this.currentBandwidth;
+	}
+	
+	public void setTypeOfService(final TypeOfService toS) {
+		this.toS = toS;
+	}
+	
+	public TypeOfService getTypeOfService() {
+		return this.toS;
+	}
+	
+	public double getWeight() {
+		return this.weight;
+	}
+	
+	public void setWeight(final double weight) {
+		this.weight = weight;
 	}
 	
 	public boolean isBooted() {

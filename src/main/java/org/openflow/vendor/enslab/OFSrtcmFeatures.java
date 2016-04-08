@@ -2,10 +2,13 @@ package org.openflow.vendor.enslab;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
-public class OFSrtcmFeaturesReply implements OFMarkerReply {
+public class OFSrtcmFeatures implements OFMarkerData {
+   
+	protected int CIR;
     
-    protected int CIR;
     protected long CBS, EBS;
+    
+    protected byte cBorrowSuccessProb, eBorrowSuccessProb;
     
     public void setCIR(final int CIR) {
     	this.CIR = CIR;
@@ -31,9 +34,25 @@ public class OFSrtcmFeaturesReply implements OFMarkerReply {
     	return this.EBS;
     }
     
+    public void setCBorrowSuccessProb(final byte cBorrowSuccessProb) {
+    	this.cBorrowSuccessProb = cBorrowSuccessProb;
+    }
+    
+    public void setEBorrowSuccessProb(final byte eBorrowSuccessProb) {
+    	this.eBorrowSuccessProb = eBorrowSuccessProb;
+    }
+    
+    public byte getCBorrowSuccessProb() {
+    	return this.cBorrowSuccessProb;
+    }
+    
+    public byte getEBorrowSuccessProb() {
+    	return this.eBorrowSuccessProb;
+    }
+    
     @Override
     public int getLength() {
-        return 24;
+        return 32;
     }
 
     @Override
@@ -42,6 +61,10 @@ public class OFSrtcmFeaturesReply implements OFMarkerReply {
         data.readInt();
         this.CBS = data.readLong();
         this.EBS = data.readLong();
+        this.cBorrowSuccessProb = data.readByte();
+        this.eBorrowSuccessProb = data.readByte();
+        data.readInt();
+        data.readShort();
     }
 
     @Override
@@ -50,5 +73,9 @@ public class OFSrtcmFeaturesReply implements OFMarkerReply {
         data.writeInt(0);
         data.writeLong(this.CBS);
         data.writeLong(this.EBS);
+        data.writeByte(this.cBorrowSuccessProb);
+        data.writeByte(this.eBorrowSuccessProb);
+        data.writeInt(0);
+        data.writeShort(0);
     }
 }

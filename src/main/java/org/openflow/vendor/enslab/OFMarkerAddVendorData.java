@@ -16,35 +16,23 @@ public class OFMarkerAddVendorData extends OFEnslabVendorData {
         return OFMarkerAddVendorData.instantiable;
     }
     
-    public static final int ENSLAB_MARKER_TYPE_SRTCM = 1;
-    
-    public static final int ENSLAB_MARKER_TYPE_TRTCM = 2;
+    public static final int MINIMUM_LENGTH = 8;
     
     public static final int ENSLAB_MARKER_ADD = 100;
     
-    protected int markerType;
+    protected OFMarkerType markerType;
     protected int markerId;
+    protected OFMarkerData markerData;
     
     public OFMarkerAddVendorData() {
-    	super(OFMarkerAddVendorData.ENSLAB_MARKER_ADD);
-    }
-    
-    public OFMarkerAddVendorData(final int markerId) {
-    	super(OFMarkerAddVendorData.ENSLAB_MARKER_ADD);
-    	this.markerId = markerId;
-    }
-    
-    public OFMarkerAddVendorData(final int markerId, final int markerType) {
-    	super(OFMarkerAddVendorData.ENSLAB_MARKER_ADD);
-    	this.markerId = markerId;
-    	this.markerType = markerType;
+    	super(OFEnslabVendorData.ENSLAB_MARKER_ADD);
     }
     
     public void setMarkerId(final int markerId) {
     	this.markerId = markerId;
     }
     
-    public void setMarkerType(final int markerType) {
+    public void setMarkerType(final OFMarkerType markerType) {
     	this.markerType = markerType;
     }
     
@@ -52,26 +40,37 @@ public class OFMarkerAddVendorData extends OFEnslabVendorData {
     	return this.markerId;
     }
     
-    public int getMarkerType() {
+    public OFMarkerType getMarkerType() {
     	return this.markerType;
+    }
+    
+    public void setMarkerData(final OFMarkerData markerData) {
+    	this.markerData = markerData;
+    }
+    
+    public OFMarkerData getMarkerData() {
+    	return this.markerData;
     }
     
     @Override
     public int getLength() {
-        return super.getLength() + 8;
+        return super.getLength() + OFMarkerAddVendorData.MINIMUM_LENGTH + markerData.getLength();
     }
 
     @Override
     public void readFrom(final ChannelBuffer data, final int length) {
         super.readFrom(data, length);
-        this.markerType = data.readInt();
+        this.markerType = OFMarkerType.valueOf(data.readInt());
         this.markerId = data.readInt();
+        this.markerData = this.markerType.newInstance(OFEnslabVendorData.ENSLAB_MARKER_ADD);
+        this.markerData.readFrom(data);
     }
 
     @Override
     public void writeTo(final ChannelBuffer data) {
         super.writeTo(data);
-        data.writeInt(this.markerType);
+        data.writeInt(this.markerType.value());
         data.writeInt(this.markerId);
+        this.markerData.writeTo(data);
     }
 }
