@@ -58,6 +58,7 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
     // The Xid mapper
     private final XidTranslator<OVXSwitch> translator;
     private StatisticsManager statsMan = null;
+    // SJM NIaaS
     private AtomicReference<Map<Short, OVXPortStatisticsReply>> portStats;
     private AtomicReference<Map<Integer, List<OVXFlowStatisticsReply>>> flowStats;
     // SJM NIaaS

@@ -17,7 +17,7 @@ import net.onrc.openvirtex.elements.marker.Marker;
 import net.onrc.openvirtex.elements.marker.SrtcMarker;
 import net.onrc.openvirtex.messages.OVXVendor;
 
-public class Scheduler implements OVXSendMsg {
+public class MarkerScheduler implements OVXSendMsg {
 	
 	private static final double ALPHA = 0.4;
 	
@@ -25,9 +25,9 @@ public class Scheduler implements OVXSendMsg {
 	
 	private enum BucketType { C_BUCKET, E_BUCKET; }
 	
-	Logger log = LogManager.getLogger(Scheduler.class.getName());
+	Logger log = LogManager.getLogger(MarkerScheduler.class.getName());
 	
-	public Scheduler(PhysicalSwitch sw) {
+	public MarkerScheduler(PhysicalSwitch sw) {
 		this.sw = sw;
 	}
 	

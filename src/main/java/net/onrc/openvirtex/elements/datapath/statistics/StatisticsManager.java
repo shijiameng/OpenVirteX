@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import net.onrc.openvirtex.core.OpenVirteXController;
 import net.onrc.openvirtex.core.io.OVXSendMsg;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
+import net.onrc.openvirtex.elements.datapath.scheduler.MarkerScheduler;
 import net.onrc.openvirtex.elements.marker.Marker;
 import net.onrc.openvirtex.elements.network.PhysicalNetwork;
 import net.onrc.openvirtex.messages.OVXStatisticsRequest;
@@ -51,6 +52,10 @@ public class StatisticsManager implements TimerTask, OVXSendMsg {
 
     private Integer refreshInterval = 30;
     private boolean stopTimer = false;
+    
+    // SJM NIaaS
+    private MarkerScheduler sch;
+    // SJM NIaaS END
 
     public StatisticsManager(PhysicalSwitch sw) {
         /*
@@ -60,6 +65,7 @@ public class StatisticsManager implements TimerTask, OVXSendMsg {
         this.sw = sw;
         this.refreshInterval = OpenVirteXController.getInstance()
                 .getStatsRefresh();
+        this.sch = new MarkerScheduler(sw);
     }
 
     @Override
@@ -69,6 +75,7 @@ public class StatisticsManager implements TimerTask, OVXSendMsg {
         sendFlowStatistics(0, (short) 0);
         // SJM NIaaS: Collect marker statistics
         sendMarkerStatistics();
+        sch.scheduleNext();
         // SJM NIaaS END
         
         if (!this.stopTimer) {
