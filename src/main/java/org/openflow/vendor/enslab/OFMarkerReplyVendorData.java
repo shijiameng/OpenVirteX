@@ -51,7 +51,7 @@ public class OFMarkerReplyVendorData extends OFEnslabVendorData {
 	}
 	
 	public void setMarkerType(OFMarkerType markerType) {
-		this.markerType = OFMarkerType.valueOf(markerType.value());
+		this.markerType = OFMarkerType.valueOf(markerType.getValue());
 	}
 	
 	public OFMarkerType getMarkerType() {
@@ -82,7 +82,7 @@ public class OFMarkerReplyVendorData extends OFEnslabVendorData {
     public void writeTo(final ChannelBuffer data) {
         super.writeTo(data);
         data.writeInt(this.markerId);
-        data.writeInt(this.markerType.value());
+        data.writeInt(this.markerType.getValue());
         reply.writeTo(data);
     }
 }

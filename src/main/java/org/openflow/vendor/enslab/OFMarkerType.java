@@ -3,12 +3,13 @@ package org.openflow.vendor.enslab;
 import java.lang.reflect.Constructor;
 
 import org.openflow.protocol.Instantiable;
+import org.openflow.vendor.enslab.statistics.OFSrtcmFeatures;
+import org.openflow.vendor.enslab.statistics.OFSrtcmStatistics;
 
 public enum OFMarkerType {
 	ENSLAB_MARKER_SRTC(1, "srTCM", 
 			OFSrtcmFeatures.class, 
-			OFSrtcmStats.class,
-			OFSrtcmPenalty.class,
+			OFSrtcmStatistics.class,
 			new Instantiable<OFMarkerData>() {
 				@Override
 				public OFMarkerData instantiate() {
@@ -17,12 +18,7 @@ public enum OFMarkerType {
 			}, new Instantiable<OFMarkerData>() {
 				@Override
 				public OFMarkerData instantiate() {
-					return new OFSrtcmStats();
-				}
-			}, new Instantiable<OFMarkerData>() {
-				@Override
-				public OFMarkerData instantiate() {
-					return new OFSrtcmPenalty();
+					return new OFSrtcmStatistics();
 				}
 			}),
 	
@@ -30,17 +26,15 @@ public enum OFMarkerType {
 	
 	private int value;
 	private String name;
-	private Class<? extends OFMarkerData> features, stats, penalty;
+	private Class<? extends OFMarkerData> features, stats;
 	protected Constructor<? extends OFMarkerData> featuresConstructor, statsConstructor, penaltyConstructor;
-	private Instantiable<OFMarkerData> featuresInstantiable, statsInstantiable, penaltyInstantiable;
+	private Instantiable<OFMarkerData> featuresInstantiable, statsInstantiable;
     
     private OFMarkerType(final int markerType, final String name,
     		final Class<? extends OFMarkerData> featuresClass,
     		final Class<? extends OFMarkerData> statsClass,
-    		final Class<? extends OFMarkerData> penaltyClass,
             final Instantiable<OFMarkerData> featuresInstantiable,
-            final Instantiable<OFMarkerData> statsInstantiable,
-            final Instantiable<OFMarkerData> penaltyInstantiable) {
+            final Instantiable<OFMarkerData> statsInstantiable) {
 
     	this.value = markerType;
 		this.name = name;
@@ -60,18 +54,8 @@ public enum OFMarkerType {
                     "Failure getting constructor for class: " + statsClass, e);
 		}
 		
-		this.penalty = penaltyClass;
-		try {
-			this.penaltyConstructor = penaltyClass.getConstructor(new Class[] {});
-		} catch (Exception e) {
-			throw new RuntimeException(
-                    "Failure getting constructor for class: " + penaltyClass, e);
-		}
-		
 		this.featuresInstantiable = featuresInstantiable;
 		this.statsInstantiable = statsInstantiable;
-		this.penaltyInstantiable = penaltyInstantiable;
-		
     }
     
     private OFMarkerType(final int markerType, final String name) {
@@ -92,7 +76,7 @@ public enum OFMarkerType {
 		}
 	}
 
-	public int value() {
+	public int getValue() {
 		return this.value;
 	}
 	
@@ -108,9 +92,6 @@ public enum OFMarkerType {
 			
 		case OFEnslabVendorData.ENSLAB_MARKER_STATS_REPLY:
 			return this.stats;
-			
-		case OFEnslabVendorData.ENSLAB_MARKER_PENALTY_SET:
-			return this.penalty;
 			
 		default:
 			throw new RuntimeException(vendorDataType + " - Invalid data type for MARKER_REPLY");
@@ -133,14 +114,6 @@ public enum OFMarkerType {
 		this.statsInstantiable = statsInstantiable;
 	}
 	
-	public Instantiable<OFMarkerData> getPenaltyInstantiable() {
-		return this.penaltyInstantiable;
-	}
-	
-	public void setPenaltyInstantiable(Instantiable<OFMarkerData> penaltyInstantiable) {
-		this.penaltyInstantiable = penaltyInstantiable;
-	}
-	
 	public OFMarkerData newInstance(final int dataType) {
 		switch (dataType) {
 		case OFEnslabVendorData.ENSLAB_MARKER_ADD:
@@ -149,9 +122,6 @@ public enum OFMarkerType {
 			
 		case OFEnslabVendorData.ENSLAB_MARKER_STATS_REPLY:
 			return this.getStatsInstantiable().instantiate();
-			
-		case OFEnslabVendorData.ENSLAB_MARKER_PENALTY_SET:
-			return this.getPenaltyInstantiable().instantiate();
 			
 		default:
 			return null;

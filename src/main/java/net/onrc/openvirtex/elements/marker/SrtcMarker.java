@@ -6,7 +6,8 @@ import org.openflow.vendor.enslab.OFEnslabVendorData;
 import org.openflow.vendor.enslab.OFMarkerAddVendorData;
 import org.openflow.vendor.enslab.OFMarkerRemoveVendorData;
 import org.openflow.vendor.enslab.OFMarkerType;
-import org.openflow.vendor.enslab.OFSrtcmFeatures;
+import org.openflow.vendor.enslab.statistics.OFSrtcmFeatures;
+
 import net.onrc.openvirtex.core.io.OVXSendMsg;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
 import net.onrc.openvirtex.elements.network.TypeOfService;
@@ -85,6 +86,7 @@ public class SrtcMarker extends Marker {
 		vendorData.setMarkerId(this.markerId);
 		vendorData.setMarkerData(srtcmFeatures);
 		
+		vendor.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
 		vendor.setVendorData(vendorData);
 		vendor.setLengthU(OVXVendor.MINIMUM_LENGTH + vendorData.getLength());
 		

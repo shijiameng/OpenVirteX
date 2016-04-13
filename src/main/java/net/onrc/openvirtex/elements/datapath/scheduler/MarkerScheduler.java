@@ -4,12 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openflow.protocol.OFMarker;
 import org.openflow.protocol.OFMessage;
-import org.openflow.vendor.enslab.OFEnslabVendorData;
-import org.openflow.vendor.enslab.OFMarkerPenaltySetVendorData;
 import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
 import org.openflow.vendor.enslab.OFMarkerType;
-import org.openflow.vendor.enslab.OFSrtcmPenalty;
-import org.openflow.vendor.enslab.OFSrtcmStats;
+import org.openflow.vendor.enslab.statistics.OFSrtcmStatistics;
 
 import net.onrc.openvirtex.core.io.OVXSendMsg;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
@@ -41,7 +38,7 @@ public class MarkerScheduler implements OVXSendMsg {
 		long totalBorrowed = 0;
 		
 		if (stats.getMarkerType() == OFMarkerType.ENSLAB_MARKER_SRTC) {
-			OFSrtcmStats srtcmStats = (OFSrtcmStats) stats.getReply();
+			OFSrtcmStatistics srtcmStats = (OFSrtcmStatistics) stats.getReply();
 			if (type == BucketType.C_BUCKET) 
 				totalBorrowed = srtcmStats.getNumberOfCBorrowed();
 			else
@@ -61,7 +58,7 @@ public class MarkerScheduler implements OVXSendMsg {
 	private double getGlobalIdleIndicator(final BucketType type) {
 		SrtcMarker globalMarker = (SrtcMarker) sw.getMarker(OFMarker.OFPM_GLOBAL.getValue());
 		OFMarkerReplyVendorData stats = sw.getMarkerStatistics(OFMarker.OFPM_GLOBAL.getValue());
-		OFSrtcmStats srtcmStats = (OFSrtcmStats) stats.getReply();
+		OFSrtcmStatistics srtcmStats = (OFSrtcmStatistics) stats.getReply();
 		double idleIndicator = 0;
 		
 		
@@ -106,6 +103,7 @@ public class MarkerScheduler implements OVXSendMsg {
 	
 	public void sendMarkerScheduler(final SrtcMarker marker) {
 		OVXVendor msg = new OVXVendor();
+		/*
 		OFMarkerPenaltySetVendorData vendorData = new OFMarkerPenaltySetVendorData();
 		OFSrtcmPenalty markerData = new OFSrtcmPenalty();
 		
@@ -118,7 +116,7 @@ public class MarkerScheduler implements OVXSendMsg {
 		
 		msg.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
 		msg.setVendorData(vendorData);
-		msg.setLengthU(OVXVendor.MINIMUM_LENGTH + vendorData.getLength());
+		msg.setLengthU(OVXVendor.MINIMUM_LENGTH + vendorData.getLength()); */
 		
 		this.sendMsg(msg, this);
 	}

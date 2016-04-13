@@ -27,6 +27,17 @@ public class OFEnslabVendorExtensions {
                 OFMarkerRemoveVendorData.getInstantiable());
         enslabVendorId.registerVendorDataType(markerRemoveVendorData);
         
+//        OFBasicVendorDataType markerStatisticsRequest = new OFBasicVendorDataType(
+//        		OFMarkerStatisticsRequest.ENSLAB_MARKER_STATS_REQUEST,
+//        		OFMarkerStatisticsRequest.getInstantiable());
+//        enslabVendorId.registerVendorDataType(markerStatisticsRequest);
+//        
+//        OFBasicVendorDataType markerStatisticsReply = new OFBasicVendorDataType(
+//        		OFMarkerStatisticsReply.ENSLAB_MARKER_STATS_REPLY,
+//        		OFMarkerStatisticsReply.getInstantiable());
+//        enslabVendorId.registerVendorDataType(markerStatisticsReply);
+        		
+        /*
         OFBasicVendorDataType markerFeaturesReplyVendorData = new OFBasicVendorDataType(
         		OFMarkerReplyVendorData.ENSLAB_MARKER_FEATURES_REPLY,
         		OFMarkerReplyVendorData.getInstantiable());
@@ -46,7 +57,7 @@ public class OFEnslabVendorExtensions {
         		OFMarkerRequestVendorData.ENSLAB_MARKER_STATS_REQUEST,
         		OFMarkerRequestVendorData.getInstantiable());
         enslabVendorId.registerVendorDataType(markerStatsRequestVendorData);
-        
+        */
 
         initialized = true;
     }

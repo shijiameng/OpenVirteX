@@ -42,13 +42,24 @@ import org.jboss.netty.buffer.ChannelBuffer;
 public class OFVendorStatistics implements OFStatistics {
     protected int vendor;
     protected byte[] body;
-
+    
     // non-message fields
     protected int length = 0;
-
+    
+    // SJM NIaaS
+    public void setVendor(final int vendor) {
+    	this.vendor = vendor;
+    }
+    
+    public void setVendorBody(byte[] body) {
+    	this.body = body;
+    }
+    // SJM NIaaS END
+    
     @Override
     public void readFrom(final ChannelBuffer data) {
         this.vendor = data.readInt();
+        
         if (this.body == null) {
             this.body = new byte[this.length - 4];
         }
@@ -58,6 +69,7 @@ public class OFVendorStatistics implements OFStatistics {
     @Override
     public void writeTo(final ChannelBuffer data) {
         data.writeInt(this.vendor);
+        
         if (this.body != null) {
             data.writeBytes(this.body);
         }

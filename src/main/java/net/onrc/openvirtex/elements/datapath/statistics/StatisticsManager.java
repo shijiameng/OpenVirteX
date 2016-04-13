@@ -22,12 +22,11 @@ import net.onrc.openvirtex.core.OpenVirteXController;
 import net.onrc.openvirtex.core.io.OVXSendMsg;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
 import net.onrc.openvirtex.elements.datapath.scheduler.MarkerScheduler;
-import net.onrc.openvirtex.elements.marker.Marker;
 import net.onrc.openvirtex.elements.network.PhysicalNetwork;
 import net.onrc.openvirtex.messages.OVXStatisticsRequest;
-import net.onrc.openvirtex.messages.OVXVendor;
 import net.onrc.openvirtex.messages.statistics.OVXFlowStatisticsRequest;
 import net.onrc.openvirtex.messages.statistics.OVXPortStatisticsRequest;
+import net.onrc.openvirtex.messages.statistics.OVXVendorStatistics;
 import net.onrc.openvirtex.protocol.OVXMatch;
 
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +40,7 @@ import org.openflow.protocol.OFPort;
 import org.openflow.protocol.Wildcards;
 import org.openflow.protocol.statistics.OFStatisticsType;
 import org.openflow.vendor.enslab.OFEnslabVendorData;
-import org.openflow.vendor.enslab.OFMarkerRequestVendorData;
+import org.openflow.vendor.enslab.statistics.OFMarkerStatisticsRequest;
 
 public class StatisticsManager implements TimerTask, OVXSendMsg {
 
@@ -75,7 +74,7 @@ public class StatisticsManager implements TimerTask, OVXSendMsg {
         sendFlowStatistics(0, (short) 0);
         // SJM NIaaS: Collect marker statistics
         sendMarkerStatistics();
-        sch.scheduleNext();
+        //sch.scheduleNext();
         // SJM NIaaS END
         
         if (!this.stopTimer) {
@@ -115,22 +114,22 @@ public class StatisticsManager implements TimerTask, OVXSendMsg {
     
     // SJM NIaaS: Send marker statistics request
     private void sendMarkerStatistics() {
-    	OVXVendor req = new OVXVendor();
-    	OFMarkerRequestVendorData mreq = new OFMarkerRequestVendorData();
-    	Marker[] marker = this.sw.getAllMarkers();
+    	OVXStatisticsRequest req = new OVXStatisticsRequest();
+    	req.setStatisticType(OFStatisticsType.VENDOR);
     	
-    	mreq.setDataType(OFMarkerRequestVendorData.ENSLAB_MARKER_STATS_REQUEST);
-    	req.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
-    	req.setLengthU(req.getLengthU() + mreq.getLength());
-    	req.setVendorData(mreq);
+    	OVXVendorStatistics vreq = new OVXVendorStatistics();
+    	vreq.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
     	
-    	mreq.setMarkerId(OFMarker.OFPM_GLOBAL.getValue());
+    	OFMarkerStatisticsRequest mreq = new OFMarkerStatisticsRequest();
+    	mreq.setMarkerId(OFMarker.OFPM_ALL.getValue());
+    	
+    	vreq.setVendorBody(mreq.toByteArray());
+    	vreq.setLength(4 + mreq.getLength());
+    	
+    	req.setStatistics(Collections.singletonList(vreq));
+    	req.setLengthU(req.getLengthU() + vreq.getLength());
+    	
     	sendMsg(req, this);
-    	
-    	for (int i = 0; i < marker.length; i++) {
-	    	mreq.setMarkerId(marker[i].getMarkerId());
-	    	sendMsg(req, this);
-    	}
     }
     // SJM NIaaS END
 

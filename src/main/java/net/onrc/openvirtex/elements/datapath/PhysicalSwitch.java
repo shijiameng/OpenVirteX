@@ -47,7 +47,7 @@ import org.openflow.vendor.enslab.OFEnslabVendorData;
 import org.openflow.vendor.enslab.OFMarkerAddVendorData;
 import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
 import org.openflow.vendor.enslab.OFMarkerType;
-import org.openflow.vendor.enslab.OFSrtcmFeatures;
+import org.openflow.vendor.enslab.statistics.OFSrtcmFeatures;
 
 /**
  * The Class PhysicalSwitch.
@@ -226,9 +226,6 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         PhysicalSwitch.log.info("Switch connected with dpid {}, name {} and type {}",
                 this.featuresReply.getDatapathId(), this.getSwitchName(),
                 this.desc.getHardwareDescription());
-        PhysicalNetwork.getInstance().addSwitch(this);
-        this.fillPortMap();
-        this.statsMan.start();
         
         // SJM NIaaS: Add a global marker when booting this switch
         OVXVendor vendor = new OVXVendor();
@@ -250,6 +247,11 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         vendor.setLengthU(OVXVendor.MINIMUM_LENGTH + vendorData.getLength());
         this.sendMsg(vendor, this);
         // SJM NIaaS END
+        
+        PhysicalNetwork.getInstance().addSwitch(this);
+        this.fillPortMap();
+        this.statsMan.start();
+        
         return true;
     }
     

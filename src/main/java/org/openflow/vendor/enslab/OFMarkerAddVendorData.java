@@ -69,7 +69,7 @@ public class OFMarkerAddVendorData extends OFEnslabVendorData {
     @Override
     public void writeTo(final ChannelBuffer data) {
         super.writeTo(data);
-        data.writeInt(this.markerType.value());
+        data.writeInt(this.markerType.getValue());
         data.writeInt(this.markerId);
         this.markerData.writeTo(data);
     }

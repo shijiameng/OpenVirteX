@@ -21,7 +21,7 @@ import org.openflow.protocol.OFVendor;
 import org.openflow.vendor.enslab.OFEnslabVendorData;
 import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
 import org.openflow.vendor.enslab.OFMarkerType;
-import org.openflow.vendor.enslab.OFSrtcmStats;
+import org.openflow.vendor.enslab.statistics.OFSrtcmStatistics;
 
 import net.onrc.openvirtex.elements.datapath.OVXSwitch;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
@@ -57,7 +57,7 @@ public class OVXVendor extends OFVendor implements Virtualizable,
         	case OFEnslabVendorData.ENSLAB_MARKER_STATS_REPLY:
         		OFMarkerReplyVendorData statsReply = (OFMarkerReplyVendorData) vendorData;
 	        	if (statsReply.getMarkerType() == OFMarkerType.ENSLAB_MARKER_SRTC) {
-	        		OFSrtcmStats srtcmStatsReply = (OFSrtcmStats) statsReply.getReply();
+	        		OFSrtcmStatistics srtcmStatsReply = (OFSrtcmStatistics) statsReply.getReply();
 	        		OVXVendor.log.info(srtcmStatsReply.toString());
 	        	}
 	        	sw.setMarkerStatistics(statsReply.getMarkerId(), statsReply);

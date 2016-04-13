@@ -1,8 +1,9 @@
-package org.openflow.vendor.enslab;
+package org.openflow.vendor.enslab.statistics;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.openflow.vendor.enslab.OFMarkerData;
 
-public class OFSrtcmStats implements OFMarkerData {
+public class OFSrtcmStatistics implements OFMarkerData {
     
     protected long nPackets, nBytes;
     protected long nGreenPackets, nGreenBytes;
@@ -107,42 +108,6 @@ public class OFSrtcmStats implements OFMarkerData {
     	this.nEBorrowed = nTokens;
     }
     
-    @Override
-    public int getLength() {
-        return 96;
-    }
-
-    @Override
-    public void readFrom(final ChannelBuffer data) {
-        this.nPackets = data.readLong();
-        this.nBytes = data.readLong();
-        this.nGreenPackets = data.readLong();
-        this.nGreenBytes = data.readLong();
-        this.nYellowPackets = data.readLong();
-        this.nYellowBytes = data.readLong();
-        this.nRedPackets = data.readLong();
-        this.nRedBytes = data.readLong();
-        this.nCTokens = data.readLong();
-        this.nETokens = data.readLong();
-        this.nCBorrowed = data.readLong();
-        this.nEBorrowed = data.readLong();
-    }
-
-    @Override
-    public void writeTo(final ChannelBuffer data) {
-        data.writeLong(this.nPackets);
-        data.writeLong(this.nBytes);
-        data.writeLong(this.nGreenPackets);
-        data.writeLong(this.nGreenBytes);
-        data.writeLong(this.nYellowPackets);
-        data.writeLong(this.nYellowBytes);
-        data.writeLong(this.nRedPackets);
-        data.writeLong(this.nRedBytes);
-        data.writeLong(this.nCTokens);
-        data.writeLong(this.nETokens);
-        data.writeLong(this.nCBorrowed);
-        data.writeLong(this.nEBorrowed);
-    }
     
     @Override
     public String toString() {
@@ -153,4 +118,41 @@ public class OFSrtcmStats implements OFMarkerData {
     			", n_c_tokens: " + this.nCTokens + ", n_e_tokens: " + this.nETokens +
     			", n_c_borrowed: " + this.nCBorrowed + ", n_e_borrowed: " + this.nEBorrowed;
     }
+
+	@Override
+	public int getLength() {
+		return 96;
+	}
+
+	@Override
+	public void readFrom(ChannelBuffer data) {
+		this.nPackets = data.readLong();
+		this.nBytes = data.readLong();
+		this.nGreenPackets = data.readLong();
+		this.nGreenBytes = data.readLong();
+		this.nYellowPackets = data.readLong();
+		this.nYellowBytes = data.readLong();
+		this.nRedPackets = data.readLong();
+		this.nRedBytes = data.readLong();
+		this.nCTokens = data.readLong();
+		this.nETokens = data.readLong();
+		this.nCBorrowed = data.readLong();
+		this.nEBorrowed = data.readLong();
+	}
+
+	@Override
+	public void writeTo(ChannelBuffer data) {
+		data.writeLong(this.nPackets);
+		data.writeLong(this.nBytes);
+		data.writeLong(this.nGreenPackets);
+		data.writeLong(this.nGreenBytes);
+		data.writeLong(this.nYellowPackets);
+		data.writeLong(this.nYellowBytes);
+		data.writeLong(this.nRedPackets);
+		data.writeLong(this.nRedBytes);
+		data.writeLong(this.nCTokens);
+		data.writeLong(this.nETokens);
+		data.writeLong(this.nCBorrowed);
+		data.writeLong(this.nEBorrowed);
+	}
 }

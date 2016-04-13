@@ -2,6 +2,7 @@ package org.openflow.protocol;
 
 public enum OFMarker {
 	OFPM_MAX	((int) 0x0000ff00),
+	OFPM_ALL	((int) 0xffffffff),
 	OFPM_NONE 	((int) 0x0000ffff),
 	OFPM_GLOBAL ((int) 0x0000fffe);
 	

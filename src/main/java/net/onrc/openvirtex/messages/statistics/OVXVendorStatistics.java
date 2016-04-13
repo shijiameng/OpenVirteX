@@ -20,11 +20,18 @@ import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
 import net.onrc.openvirtex.messages.OVXStatisticsReply;
 import net.onrc.openvirtex.messages.OVXStatisticsRequest;
 
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openflow.protocol.statistics.OFStatistics;
 import org.openflow.protocol.statistics.OFVendorStatistics;
 
 public class OVXVendorStatistics extends OFVendorStatistics implements
         VirtualizableStatistic, DevirtualizableStatistic {
 
+	static Logger log = LogManager.getLogger(OVXVendorStatistics.class.getName());
+	
     @Override
     public void devirtualizeStatistic(final OVXSwitch sw,
             final OVXStatisticsRequest msg) {
@@ -36,6 +43,13 @@ public class OVXVendorStatistics extends OFVendorStatistics implements
     public void virtualizeStatistic(final PhysicalSwitch sw,
             final OVXStatisticsReply msg) {
         // TODO Auto-generated method stub
+    	
+    	List<? extends OFStatistics> statList = msg.getStatistics();
+        
+    	for (OFStatistics stat : statList) {
+    		OVXVendorStatistics vStat = (OVXVendorStatistics) stat;
+    		
+    	}
 
     }
 
