@@ -54,6 +54,10 @@ public class OFVendorStatistics implements OFStatistics {
     public void setVendorBody(byte[] body) {
     	this.body = body;
     }
+    
+    public byte[] getVendorBody() {
+    	return this.body;
+    }
     // SJM NIaaS END
     
     @Override

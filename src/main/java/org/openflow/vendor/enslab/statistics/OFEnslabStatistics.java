@@ -5,6 +5,11 @@ import org.jboss.netty.buffer.ChannelBuffers;
 
 public class OFEnslabStatistics {
 	
+	public static final int ENSLAB_MARKER_FEATURES_REQUEST = 105;
+	public static final int ENSLAB_MARKER_FEATURES_REPLY = 105;
+	public static final int ENSLAB_MARKER_STATS_REQUEST = 103;
+	public static final int ENSLAB_MARKER_STATS_REPLY = 103;
+	
 	protected int dataType;
 	
 	public OFEnslabStatistics(final int dataType) {

@@ -24,8 +24,11 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 import org.openflow.protocol.statistics.OFStatistics;
 import org.openflow.protocol.statistics.OFVendorStatistics;
+import org.openflow.vendor.enslab.statistics.OFMarkerStatisticsReply;
 
 public class OVXVendorStatistics extends OFVendorStatistics implements
         VirtualizableStatistic, DevirtualizableStatistic {
@@ -48,7 +51,12 @@ public class OVXVendorStatistics extends OFVendorStatistics implements
         
     	for (OFStatistics stat : statList) {
     		OVXVendorStatistics vStat = (OVXVendorStatistics) stat;
-    		
+    		ChannelBuffer buffer = ChannelBuffers.buffer(vStat.getLength());
+    		OFMarkerStatisticsReply reply = new OFMarkerStatisticsReply();
+    		buffer.writeBytes(vStat.getVendorBody());
+    		reply.readFrom(buffer);
+    		log.info(reply.toString());
+    		log.info(reply.getMarkerData().toString());
     	}
 
     }

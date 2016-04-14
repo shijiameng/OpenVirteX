@@ -4,7 +4,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.vendor.enslab.OFMarkerData;
 
 public class OFSrtcmStatistics implements OFMarkerData {
-    
+	
     protected long nPackets, nBytes;
     protected long nGreenPackets, nGreenBytes;
     protected long nYellowPackets, nYellowBytes;
@@ -111,12 +111,12 @@ public class OFSrtcmStatistics implements OFMarkerData {
     
     @Override
     public String toString() {
-    	return "n_packets: " + this.nPackets + ", n_bytes: " + this.nBytes +
-    			", n_g_packets: " + this.nGreenPackets + ", n_g_bytes: " + this.nGreenBytes  +
-    			", n_y_packets: " + this.nYellowPackets + ", n_y_bytes: " + this.nYellowBytes +
-    			", n_r_packets: " + this.nRedPackets + ", n_r_bytes: " + this.nRedBytes +
-    			", n_c_tokens: " + this.nCTokens + ", n_e_tokens: " + this.nETokens +
-    			", n_c_borrowed: " + this.nCBorrowed + ", n_e_borrowed: " + this.nEBorrowed;
+    	return "n_packets=" + this.nPackets + ";n_bytes=" + this.nBytes +
+    			";n_g_packets=" + this.nGreenPackets + ";n_g_bytes=" + this.nGreenBytes  +
+    			";n_y_packets=" + this.nYellowPackets + ";n_y_bytes=" + this.nYellowBytes +
+    			";n_r_packets=" + this.nRedPackets + ";n_r_bytes=" + this.nRedBytes +
+    			";n_c_tokens=" + this.nCTokens + ";n_e_tokens=" + this.nETokens +
+    			";n_c_borrowed=" + this.nCBorrowed + ";n_e_borrowed=" + this.nEBorrowed;
     }
 
 	@Override

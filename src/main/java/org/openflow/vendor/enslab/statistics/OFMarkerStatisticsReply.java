@@ -10,7 +10,7 @@ public class OFMarkerStatisticsReply extends OFEnslabStatistics {
     public final static int ENSLAB_MARKER_STATS_REPLY = 103;
     
     protected int markerId;
-	protected int markerType;
+	protected OFMarkerType markerType;
 	protected OFMarkerData markerData;
 
 	public OFMarkerStatisticsReply() {
@@ -28,14 +28,14 @@ public class OFMarkerStatisticsReply extends OFEnslabStatistics {
 	
 	
 	public void setMarkerType(final OFMarkerType markerType) {
-		this.markerType = markerType.getValue();
+		this.markerType = markerType;
 	}
 	
 	public OFMarkerType getMarkerType() {
-		return OFMarkerType.valueOf(this.markerType);
+		return this.markerType;
 	}
 	
-	public OFMarkerData getReply() {
+	public OFMarkerData getMarkerData() {
 		return this.markerData;
 	}
 
@@ -48,7 +48,8 @@ public class OFMarkerStatisticsReply extends OFEnslabStatistics {
 	public void readFrom(ChannelBuffer data) {
 		super.readFrom(data);
 		this.markerId = data.readInt();
-		this.markerType = data.readInt();
+		this.markerType = OFMarkerType.valueOf(data.readInt());
+		this.markerData = this.markerType.newInstance(ENSLAB_MARKER_STATS_REPLY);
 		markerData.readFrom(data);	
 	}
 
@@ -56,7 +57,7 @@ public class OFMarkerStatisticsReply extends OFEnslabStatistics {
 	public void writeTo(ChannelBuffer data) {
 		super.writeTo(data);
 		data.writeInt(this.markerId);
-		data.writeInt(this.markerType);
+		data.writeInt(this.markerType.getValue());
 		markerData.writeTo(data);
 	}
 	
@@ -65,6 +66,12 @@ public class OFMarkerStatisticsReply extends OFEnslabStatistics {
 		ChannelBuffer buffer = ChannelBuffers.buffer(this.getLength());
 		this.writeTo(buffer);
 		return buffer.array();
+	}
+	
+	@Override
+	public String toString() {
+		return "OFMarker reply: marker_id=" + this.markerId +
+				";type=" + this.markerType.getName();
 	}
 
 }
