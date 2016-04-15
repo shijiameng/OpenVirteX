@@ -20,6 +20,7 @@ import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
 import net.onrc.openvirtex.messages.OVXStatisticsReply;
 import net.onrc.openvirtex.messages.OVXStatisticsRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +29,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.openflow.protocol.statistics.OFStatistics;
 import org.openflow.protocol.statistics.OFVendorStatistics;
+import org.openflow.vendor.enslab.OFMarkerData;
 import org.openflow.vendor.enslab.statistics.OFMarkerStatisticsReply;
 
 public class OVXVendorStatistics extends OFVendorStatistics implements
@@ -47,16 +49,26 @@ public class OVXVendorStatistics extends OFVendorStatistics implements
             final OVXStatisticsReply msg) {
         // TODO Auto-generated method stub
     	
-    	List<? extends OFStatistics> statList = msg.getStatistics();
+    	List<? extends OFStatistics> vStatList = msg.getStatistics();
+        List<OFMarkerStatisticsReply> statList = new ArrayList<OFMarkerStatisticsReply>(); 
         
-    	for (OFStatistics stat : statList) {
+    	for (OFStatistics stat : vStatList) {
     		OVXVendorStatistics vStat = (OVXVendorStatistics) stat;
     		ChannelBuffer buffer = ChannelBuffers.buffer(vStat.getLength());
-    		OFMarkerStatisticsReply reply = new OFMarkerStatisticsReply();
+    		
     		buffer.writeBytes(vStat.getVendorBody());
-    		reply.readFrom(buffer);
-    		log.info(reply.toString());
-    		log.info(reply.getMarkerData().toString());
+    		int dataType = buffer.readInt();
+    		buffer.readInt();
+    		
+    		if (dataType == OFMarkerStatisticsReply.ENSLAB_MARKER_STATS_REPLY) {
+    			while (buffer.readable()) {
+		    		OFMarkerStatisticsReply reply = new OFMarkerStatisticsReply();	
+		    		reply.readFrom(buffer);
+		    		log.info(reply.toString());
+		    		log.info(reply.getMarkerData().toString());
+		    		statList.add(reply);
+    			}
+    		}
     	}
 
     }

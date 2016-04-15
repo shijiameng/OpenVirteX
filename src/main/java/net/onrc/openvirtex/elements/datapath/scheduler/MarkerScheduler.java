@@ -6,6 +6,7 @@ import org.openflow.protocol.OFMarker;
 import org.openflow.protocol.OFMessage;
 import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
 import org.openflow.vendor.enslab.OFMarkerType;
+import org.openflow.vendor.enslab.statistics.OFMarkerStatisticsReply;
 import org.openflow.vendor.enslab.statistics.OFSrtcmStatistics;
 
 import net.onrc.openvirtex.core.io.OVXSendMsg;
@@ -34,11 +35,11 @@ public class MarkerScheduler implements OVXSendMsg {
 	}
 	
 	private long getMarkerTotalBorrowed(final SrtcMarker marker, final BucketType type) {
-		OFMarkerReplyVendorData stats = sw.getMarkerStatistics(marker.getMarkerId());
+		OFMarkerStatisticsReply stats = sw.getMarkerStatistics(marker.getMarkerId());
 		long totalBorrowed = 0;
 		
 		if (stats.getMarkerType() == OFMarkerType.ENSLAB_MARKER_SRTC) {
-			OFSrtcmStatistics srtcmStats = (OFSrtcmStatistics) stats.getReply();
+			OFSrtcmStatistics srtcmStats = (OFSrtcmStatistics) stats.getMarkerData();
 			if (type == BucketType.C_BUCKET) 
 				totalBorrowed = srtcmStats.getNumberOfCBorrowed();
 			else
@@ -57,8 +58,8 @@ public class MarkerScheduler implements OVXSendMsg {
 	
 	private double getGlobalIdleIndicator(final BucketType type) {
 		SrtcMarker globalMarker = (SrtcMarker) sw.getMarker(OFMarker.OFPM_GLOBAL.getValue());
-		OFMarkerReplyVendorData stats = sw.getMarkerStatistics(OFMarker.OFPM_GLOBAL.getValue());
-		OFSrtcmStatistics srtcmStats = (OFSrtcmStatistics) stats.getReply();
+		OFMarkerStatisticsReply stats = sw.getMarkerStatistics(OFMarker.OFPM_GLOBAL.getValue());
+		OFSrtcmStatistics srtcmStats = (OFSrtcmStatistics) stats.getMarkerData();
 		double idleIndicator = 0;
 		
 		
@@ -74,7 +75,7 @@ public class MarkerScheduler implements OVXSendMsg {
 	}
 	
 	public double calcPenalty(final SrtcMarker marker, final BucketType type) {
-		final int currentBW = marker.getCurrentBandwidth();
+		final int currentDataRate = marker.getCurrentDataRate();
 		final double currentPenalty;
 		double newPenalty;
 		
@@ -83,7 +84,7 @@ public class MarkerScheduler implements OVXSendMsg {
 		else
 			currentPenalty = marker.getETokenPenalty();
 		
-		if (currentBW > marker.getCommittedInfoRate()) {
+		if (currentDataRate > marker.getCommittedInfoRate()) {
 			double globalUsage = this.getGlobalTokenUsage(marker, type);
 			if (this.getGlobalIdleIndicator(type) < ALPHA) {
 				if (currentPenalty > 0) {

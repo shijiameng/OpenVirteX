@@ -3,7 +3,7 @@ package org.openflow.vendor.enslab;
 import java.lang.reflect.Constructor;
 
 import org.openflow.protocol.Instantiable;
-import org.openflow.vendor.enslab.statistics.OFEnslabStatistics;
+import org.openflow.vendor.enslab.statistics.OFMarkerStatisticsReply;
 import org.openflow.vendor.enslab.statistics.OFSrtcmFeatures;
 import org.openflow.vendor.enslab.statistics.OFSrtcmStatistics;
 
@@ -87,11 +87,11 @@ public enum OFMarkerType {
 	
 	public Class<? extends OFMarkerData> toClass(final int vendorDataType) {
 		switch (vendorDataType) {
-		case OFEnslabVendorData.ENSLAB_MARKER_ADD:
-		case OFEnslabStatistics.ENSLAB_MARKER_FEATURES_REPLY:
-			return this.features;
-			
-		case OFEnslabStatistics.ENSLAB_MARKER_STATS_REPLY:
+		case OFMarkerAddVendorData.ENSLAB_MARKER_ADD:
+//		case OFMarkerFeaturesReply.ENSLAB_MARKER_FEATURES_REPLY:
+//			return this.features;
+//			
+		case OFMarkerStatisticsReply.ENSLAB_MARKER_STATS_REPLY:
 			return this.stats;
 			
 		default:
@@ -118,10 +118,10 @@ public enum OFMarkerType {
 	public OFMarkerData newInstance(final int dataType) {
 		switch (dataType) {
 		case OFEnslabVendorData.ENSLAB_MARKER_ADD:
-		case OFEnslabStatistics.ENSLAB_MARKER_FEATURES_REPLY:
-			return this.getFeaturesInstantiable().instantiate();
+//		case OFEnslabStatistics.ENSLAB_MARKER_FEATURES_REPLY:
+//			return this.getFeaturesInstantiable().instantiate();
 			
-		case OFEnslabStatistics.ENSLAB_MARKER_STATS_REPLY:
+		case OFMarkerStatisticsReply.ENSLAB_MARKER_STATS_REPLY:
 			return this.getStatsInstantiable().instantiate();
 			
 		default:

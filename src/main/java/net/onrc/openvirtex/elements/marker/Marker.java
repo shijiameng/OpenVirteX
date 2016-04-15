@@ -17,7 +17,7 @@ public abstract class Marker implements Persistable, OVXSendMsg {
 	protected OFMarkerType type;
 	
 	protected TypeOfService toS;
-	protected int currentBandwidth;
+	protected int currentDataRate;
 	protected double weight;
 		
 	protected PhysicalSwitch parentSwitch;
@@ -59,12 +59,12 @@ public abstract class Marker implements Persistable, OVXSendMsg {
 		return this.parentSwitch;
 	}
 	
-	public void setCurrentBandwidth(final int currentBandwidth) {
-		this.currentBandwidth = currentBandwidth;
+	public void setCurrentDataRate(final int currentDataRate) {
+		this.currentDataRate = currentDataRate;
 	}
 	
-	public int getCurrentBandwidth() {
-		return this.currentBandwidth;
+	public int getCurrentDataRate() {
+		return this.currentDataRate;
 	}
 	
 	public void setTypeOfService(final TypeOfService toS) {

@@ -47,7 +47,9 @@ import org.openflow.vendor.enslab.OFEnslabVendorData;
 import org.openflow.vendor.enslab.OFMarkerAddVendorData;
 import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
 import org.openflow.vendor.enslab.OFMarkerType;
+import org.openflow.vendor.enslab.statistics.OFMarkerStatisticsReply;
 import org.openflow.vendor.enslab.statistics.OFSrtcmFeatures;
+import org.openflow.vendor.enslab.statistics.OFSrtcmStatistics;
 
 /**
  * The Class PhysicalSwitch.
@@ -63,7 +65,7 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
     private AtomicReference<Map<Integer, List<OVXFlowStatisticsReply>>> flowStats;
     // SJM NIaaS
     private Map<Integer, Marker> markerMap;
-    private AtomicReference<Map<Integer, OFMarkerReplyVendorData>> markerStats;
+    private AtomicReference<Map<Integer, OFMarkerStatisticsReply>> markerStats;
     // SJM NIaaS END
     /**
      * Unregisters OVXSwitches and associated virtual elements mapped to this
@@ -115,7 +117,7 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         this.statsMan = new StatisticsManager(this);
         // SJM NIaaS
         this.markerMap = new HashMap<Integer, Marker>();
-        this.markerStats = new AtomicReference<Map<Integer, OFMarkerReplyVendorData>>();
+        this.markerStats = new AtomicReference<Map<Integer, OFMarkerStatisticsReply>>();
         // SJM NIaaS END
     }
 
@@ -338,11 +340,24 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
     }
     
     // SJM NIaaS
-    public void setMarkerStatistics(Integer markerId, OFMarkerReplyVendorData stats) {
-    	this.markerStats.get().put(markerId, stats);
+    public void setMarkerStatistics(Map<Integer, OFMarkerStatisticsReply> stats) {
+    	Map<Integer, OFMarkerStatisticsReply> oldStats = this.markerStats.get();
+    	for (Integer markerId : stats.keySet()) {
+    		if (markerId == OFMarker.OFPM_GLOBAL.getValue()) continue;
+    		OFMarkerStatisticsReply newMarkerStatsReply = stats.get(markerId);
+    		OFMarkerStatisticsReply oldMarkerStatsReply = oldStats.get(markerId);
+    		Marker marker = this.getMarker(markerId);
+    		if (newMarkerStatsReply.getMarkerType() == OFMarkerType.ENSLAB_MARKER_SRTC) {
+    			OFSrtcmStatistics newMarkerStats = (OFSrtcmStatistics) newMarkerStatsReply.getMarkerData();
+    			OFSrtcmStatistics oldMarkerStats = (OFSrtcmStatistics) oldMarkerStatsReply.getMarkerData();
+    			long dataRate = (newMarkerStats.getNumberOfBytes() - oldMarkerStats.getNumberOfBytes()) * 8 / 30;
+    			marker.setCurrentDataRate((int) dataRate);
+    		}
+    	}
+    	this.markerStats.set(stats);
     }
     
-    public OFMarkerReplyVendorData getMarkerStatistics(Integer markerId) {
+    public OFMarkerStatisticsReply getMarkerStatistics(Integer markerId) {
     	return this.markerStats.get().get(markerId);
     }
     // SJM NIaaS END

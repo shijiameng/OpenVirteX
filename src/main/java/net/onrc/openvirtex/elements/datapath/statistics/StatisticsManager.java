@@ -123,8 +123,8 @@ public class StatisticsManager implements TimerTask, OVXSendMsg {
     	OFMarkerStatisticsRequest mreq = new OFMarkerStatisticsRequest();
     	mreq.setMarkerId(OFMarker.OFPM_ALL.getValue());
     	
-    	vreq.setVendorBody(mreq.toByteArray());
-    	vreq.setLength(4 + mreq.getLength());
+    	vreq.setVendorBody(OFMarkerStatisticsRequest.ENSLAB_MARKER_STATS_REQUEST, mreq);
+    	vreq.setLength(4 + 8 + mreq.getLength());
     	
     	req.setStatistics(Collections.singletonList(vreq));
     	req.setLengthU(req.getLengthU() + vreq.getLength());

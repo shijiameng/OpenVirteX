@@ -33,6 +33,8 @@
 package org.openflow.protocol.statistics;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
+import org.openflow.vendor.enslab.statistics.OFEnslabStatistics;
 
 /**
  * The base class for vendor implemented statistics
@@ -51,8 +53,12 @@ public class OFVendorStatistics implements OFStatistics {
     	this.vendor = vendor;
     }
     
-    public void setVendorBody(byte[] body) {
-    	this.body = body;
+    public void setVendorBody(final int dataType, OFEnslabStatistics body) {
+    	ChannelBuffer buffer = ChannelBuffers.buffer(8 + body.getLength());
+    	buffer.writeInt(dataType);
+    	buffer.writeInt(0);
+    	body.writeTo(buffer);
+    	this.body = buffer.array();
     }
     
     public byte[] getVendorBody() {
