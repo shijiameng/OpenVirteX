@@ -10,11 +10,7 @@ public class OFEnslabVendorData implements OFVendorData {
 	
 	public static final int ENSLAB_MARKER_ADD = 100;
 	public static final int ENSLAB_MARKER_REMOVE = 101;
-//	public static final int ENSLAB_MARKER_FEATURES_REQUEST = 102;
-//	public static final int ENSLAB_MARKER_FEATURES_REPLY = 103;
-//	public static final int ENSLAB_MARKER_STATS_REQUEST = 104;
-//	public static final int ENSLAB_MARKER_STATS_REPLY = 105;
-//	public static final int ENSLAB_MARKER_PENALTY_SET = 106;
+	public static final int ENSLAB_MARKER_CONFIG = 102;
 	
 	public static final byte OFPM_BRW_SUCC_MAX = 100;
 	public static final byte OFPM_BRW_SUCC_MIN = 0;

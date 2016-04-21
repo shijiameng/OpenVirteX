@@ -6,17 +6,17 @@ public enum TypeOfService {
 	DROP_HIGH_PREC((byte) (3 << 4)),
 	
 	AF1((byte) 0x20, 1, 0.4),
-	AF11((byte) (AF1.value() | DROP_LOW_PREC.value())),
-	AF12((byte) (AF1.value() | DROP_MEDIUM_PREC.value())),
-	AF13((byte) (AF1.value() | DROP_HIGH_PREC.value())),
+	AF11((byte) (AF1.getValue() | DROP_LOW_PREC.getValue())),
+	AF12((byte) (AF1.getValue() | DROP_MEDIUM_PREC.getValue())),
+	AF13((byte) (AF1.getValue() | DROP_HIGH_PREC.getValue())),
 	AF2((byte) 0x40, 2, 0.3),
-	AF21((byte) (AF2.value() | DROP_LOW_PREC.value())),
-	AF22((byte) (AF2.value() | DROP_MEDIUM_PREC.value())),
-	AF23((byte) (AF2.value() | DROP_HIGH_PREC.value())),
+	AF21((byte) (AF2.getValue() | DROP_LOW_PREC.getValue())),
+	AF22((byte) (AF2.getValue() | DROP_MEDIUM_PREC.getValue())),
+	AF23((byte) (AF2.getValue() | DROP_HIGH_PREC.getValue())),
 	AF3((byte) 0x60, 3, 0.3),
-	AF31((byte) (AF3.value() | DROP_LOW_PREC.value())),
-	AF32((byte) (AF3.value() | DROP_MEDIUM_PREC.value())),
-	AF33((byte) (AF3.value() | DROP_HIGH_PREC.value()));
+	AF31((byte) (AF3.getValue() | DROP_LOW_PREC.getValue())),
+	AF32((byte) (AF3.getValue() | DROP_MEDIUM_PREC.getValue())),
+	AF33((byte) (AF3.getValue() | DROP_HIGH_PREC.getValue()));
 	
 	
 	private byte value;
@@ -46,11 +46,11 @@ public enum TypeOfService {
 		}
 	}
 	
-	public byte value() {
+	public byte getValue() {
 		return this.value;
 	}
 	
-	public int weight() {
+	public int getWeight() {
 		return this.weight;
 	}
 	

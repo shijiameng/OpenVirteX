@@ -46,7 +46,7 @@ public class AbstractAPICalls extends TestCase {
                 this.put(TenantHandler.NETADD, "10.0.0.0");
                 this.put(TenantHandler.NETMASK, 24);
                 // SJM NIaaS
-                this.put(TenantHandler.TOS, TypeOfService.AF1.value());
+                this.put(TenantHandler.TOS, TypeOfService.AF1.getValue());
                 this.put(TenantHandler.CIR, 10000000);
                 this.put(TenantHandler.CBS, 4000);
                 this.put(TenantHandler.EBS, 5000);

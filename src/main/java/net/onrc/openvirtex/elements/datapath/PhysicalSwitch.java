@@ -15,6 +15,7 @@
  ******************************************************************************/
 package net.onrc.openvirtex.elements.datapath;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,14 +23,15 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.onrc.openvirtex.core.io.OVXSendMsg;
+import net.onrc.openvirtex.elements.datapath.scheduler.MarkerScheduler;
 import net.onrc.openvirtex.elements.datapath.statistics.StatisticsManager;
 import net.onrc.openvirtex.elements.marker.Marker;
+import net.onrc.openvirtex.elements.marker.SrtcMarker;
 import net.onrc.openvirtex.elements.network.PhysicalNetwork;
 import net.onrc.openvirtex.elements.port.PhysicalPort;
 import net.onrc.openvirtex.exceptions.SwitchMappingException;
 import net.onrc.openvirtex.messages.OVXFlowMod;
 import net.onrc.openvirtex.messages.OVXStatisticsReply;
-import net.onrc.openvirtex.messages.OVXVendor;
 import net.onrc.openvirtex.messages.Virtualizable;
 import net.onrc.openvirtex.messages.statistics.OVXFlowStatisticsReply;
 import net.onrc.openvirtex.messages.statistics.OVXPortStatisticsReply;
@@ -43,12 +45,8 @@ import org.openflow.protocol.OFPhysicalPort;
 import org.openflow.protocol.OFPort;
 import org.openflow.protocol.OFVendor;
 import org.openflow.protocol.statistics.OFStatistics;
-import org.openflow.vendor.enslab.OFEnslabVendorData;
-import org.openflow.vendor.enslab.OFMarkerAddVendorData;
-import org.openflow.vendor.enslab.OFMarkerReplyVendorData;
 import org.openflow.vendor.enslab.OFMarkerType;
 import org.openflow.vendor.enslab.statistics.OFMarkerStatisticsReply;
-import org.openflow.vendor.enslab.statistics.OFSrtcmFeatures;
 import org.openflow.vendor.enslab.statistics.OFSrtcmStatistics;
 
 /**
@@ -61,6 +59,8 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
     private final XidTranslator<OVXSwitch> translator;
     private StatisticsManager statsMan = null;
     // SJM NIaaS
+    private MarkerScheduler sch = null;
+    // SJM NIaaS END
     private AtomicReference<Map<Short, OVXPortStatisticsReply>> portStats;
     private AtomicReference<Map<Integer, List<OVXFlowStatisticsReply>>> flowStats;
     // SJM NIaaS
@@ -116,28 +116,97 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         this.flowStats = new AtomicReference<Map<Integer, List<OVXFlowStatisticsReply>>>();
         this.statsMan = new StatisticsManager(this);
         // SJM NIaaS
+        this.sch = new MarkerScheduler(this);
         this.markerMap = new HashMap<Integer, Marker>();
         this.markerStats = new AtomicReference<Map<Integer, OFMarkerStatisticsReply>>();
+       
+        SrtcMarker marker = new SrtcMarker(OFMarker.OFPM_GLOBAL.getValue(), this, null);
+        marker.setCommittedBurstSize(0);
+        marker.setCommittedInfoRate(0);
+        marker.setExceedBurstSize(0);
+        this.addMarker(marker);
         // SJM NIaaS END
     }
 
-    // SJM NIaaS
+    // SJM NIaaS    
+    private void updateAllMarkersWeight() {
+    	List<Marker> markers = this.getAllMarkers();
+    	int totalWeight = 0;
+
+    	for (Marker marker : markers) {
+    		if (marker.getMarkerId() == OFMarker.OFPM_GLOBAL.getValue())
+    			continue;
+    		if (marker.getTypeOfService() != null) {
+    			totalWeight += marker.getTypeOfService().getWeight();
+    		} else {
+    			log.error("Service type of marker {} does not determined", marker.getMarkerId());
+    		}
+    	}
+    	
+    	for (Marker marker : markers) {
+    		if (marker.getMarkerId() == OFMarker.OFPM_GLOBAL.getValue())
+    			continue;
+	    	if (totalWeight != 0 && marker.getTypeOfService() != null) {
+	    		double w = (double) marker.getTypeOfService().getWeight() / (double) totalWeight;
+				marker.setWeight(w);
+				log.info("Updated weight of marker {} as {}", marker.getMarkerId(), w);
+			}
+    	}
+    }
+    
+    private void updateGlobalMarker() {
+    	SrtcMarker globalMarker = (SrtcMarker) this.getMarker(OFMarker.OFPM_GLOBAL.getValue());
+    	
+    	if (globalMarker != null) {
+	    	List<Marker> markers = this.getAllMarkers();
+	    	long totalCBS = 0, totalEBS = 0;
+	    	for (Marker marker : markers) {
+	    		if (marker.getMarkerId() == OFMarker.OFPM_GLOBAL.getValue())
+	    			continue;
+	    		totalCBS += ((SrtcMarker) marker).getCommittedBurstSize();
+	    		totalEBS += ((SrtcMarker) marker).getExceedBurstSize();
+	    	}
+	    	
+	    	if (markers.size() - 1 > 0) {
+	    		globalMarker.setCommittedBurstSize(totalCBS / (markers.size() - 1));
+	    		globalMarker.setExceedBurstSize(totalEBS / (markers.size() - 1));
+	    	} else {
+	    		globalMarker.setCommittedBurstSize(0);
+	    		globalMarker.setExceedBurstSize(0);
+	    	}
+	    	
+	    	log.info("Parameters of global marker have been updated: CBS={}, EBS={}", 
+	    			globalMarker.getCommittedBurstSize(), globalMarker.getExceedBurstSize());
+    	} else {
+    		log.error("Global Marker does not exist!");
+    	}
+    }
+    
     public void addMarker(Marker marker) {
     	this.markerMap.put(marker.getMarkerId(), marker);
+    	if (marker.getMarkerId() != OFMarker.OFPM_GLOBAL.getValue()) {
+	    	this.updateAllMarkersWeight();
+	    	this.updateGlobalMarker();
+    	}
     }
     
     public void removeMarker(Marker marker) {
     	this.markerMap.remove(marker.getMarkerId());
+    	if (marker.getMarkerId() != OFMarker.OFPM_GLOBAL.getValue()) {
+	    	this.updateAllMarkersWeight();
+	    	this.updateGlobalMarker();
+    	}
     }
     
     public Marker getMarker(Integer markerId) {
     	return this.markerMap.get(markerId);
     }
     
-    public Marker[] getAllMarkers() {
-    	return this.markerMap.values().toArray(new Marker[0]);
+    public List<Marker> getAllMarkers() {
+    	return new ArrayList<Marker>(this.markerMap.values());
     }
     // SJM NIaaS END
+    
     /**
      * Gets the OVX port number.
      *
@@ -230,24 +299,28 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
                 this.desc.getHardwareDescription());
         
         // SJM NIaaS: Add a global marker when booting this switch
-        OVXVendor vendor = new OVXVendor();
-        OFMarkerAddVendorData vendorData = new OFMarkerAddVendorData();
-        OFSrtcmFeatures srtcmFeatures = new OFSrtcmFeatures();
+//        OVXVendor vendor = new OVXVendor();
+//        OFMarkerAddVendorData vendorData = new OFMarkerAddVendorData();
+//        OFSrtcmFeatures srtcmFeatures = new OFSrtcmFeatures();
         
-        srtcmFeatures.setCIR(0);
-        srtcmFeatures.setCBS(0);
-        srtcmFeatures.setEBS(0);
-        srtcmFeatures.setCBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_NA);
-        srtcmFeatures.setEBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_NA);
-        
-        vendorData.setMarkerType(OFMarkerType.ENSLAB_MARKER_SRTC);
-        vendorData.setMarkerId(OFMarker.OFPM_GLOBAL.getValue());
-        vendorData.setMarkerData(srtcmFeatures);
-        
-        vendor.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
-        vendor.setVendorData(vendorData);
-        vendor.setLengthU(OVXVendor.MINIMUM_LENGTH + vendorData.getLength());
-        this.sendMsg(vendor, this);
+//        srtcmFeatures.setCIR(0);
+//        srtcmFeatures.setCBS(0);
+//        srtcmFeatures.setEBS(0);
+//        srtcmFeatures.setCBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_NA);
+//        srtcmFeatures.setEBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_NA);
+//        
+//        vendorData.setMarkerType(OFMarkerType.ENSLAB_MARKER_SRTC);
+//        vendorData.setMarkerId(OFMarker.OFPM_GLOBAL.getValue());
+//        vendorData.setMarkerData(srtcmFeatures);
+//        
+//        vendor.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
+//        vendor.setVendorData(vendorData);
+//        vendor.setLengthU(OVXVendor.MINIMUM_LENGTH + vendorData.getLength());
+//        this.sendMsg(vendor, this);
+        Marker globalMarker = this.markerMap.get(OFMarker.OFPM_GLOBAL.getValue());
+        if (globalMarker != null) {
+        	globalMarker.boot();
+        }
         // SJM NIaaS END
         
         PhysicalNetwork.getInstance().addSwitch(this);
@@ -343,18 +416,28 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
     public void setMarkerStatistics(Map<Integer, OFMarkerStatisticsReply> stats) {
     	Map<Integer, OFMarkerStatisticsReply> oldStats = this.markerStats.get();
     	for (Integer markerId : stats.keySet()) {
-    		if (markerId == OFMarker.OFPM_GLOBAL.getValue()) continue;
+    		if (markerId == OFMarker.OFPM_GLOBAL.getValue()) 
+    			continue;
+    		
     		OFMarkerStatisticsReply newMarkerStatsReply = stats.get(markerId);
     		OFMarkerStatisticsReply oldMarkerStatsReply = oldStats.get(markerId);
     		Marker marker = this.getMarker(markerId);
+    		
     		if (newMarkerStatsReply.getMarkerType() == OFMarkerType.ENSLAB_MARKER_SRTC) {
     			OFSrtcmStatistics newMarkerStats = (OFSrtcmStatistics) newMarkerStatsReply.getMarkerData();
-    			OFSrtcmStatistics oldMarkerStats = (OFSrtcmStatistics) oldMarkerStatsReply.getMarkerData();
-    			long dataRate = (newMarkerStats.getNumberOfBytes() - oldMarkerStats.getNumberOfBytes()) * 8 / 30;
-    			marker.setCurrentDataRate((int) dataRate);
+    			long dataRate = 0;
+    			if (oldMarkerStatsReply != null) {
+	    			OFSrtcmStatistics oldMarkerStats = (OFSrtcmStatistics) oldMarkerStatsReply.getMarkerData();
+	    			dataRate = (newMarkerStats.getNumberOfBytes() - oldMarkerStats.getNumberOfBytes()) * 8 / this.statsMan.getInterval();
+	    			marker.setMeteredDataRate((int) dataRate);
+    			} else {
+    				dataRate = newMarkerStats.getNumberOfBytes() * 8 / this.statsMan.getInterval();
+    				marker.setMeteredDataRate((int) dataRate);
+    			}
     		}
     	}
     	this.markerStats.set(stats);
+    	sch.scheduleNext();
     }
     
     public OFMarkerStatisticsReply getMarkerStatistics(Integer markerId) {

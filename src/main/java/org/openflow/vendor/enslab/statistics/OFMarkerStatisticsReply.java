@@ -58,5 +58,4 @@ public class OFMarkerStatisticsReply implements OFEnslabStatistics {
 		return "OFMarker reply: marker_id=" + this.markerId +
 				";type=" + this.markerType.getName();
 	}
-
 }

@@ -1,5 +1,6 @@
 package net.onrc.openvirtex.elements.marker;
 
+import org.openflow.protocol.OFMarker;
 import org.openflow.protocol.OFMessage;
 import org.openflow.protocol.OFVendor;
 import org.openflow.vendor.enslab.OFEnslabVendorData;
@@ -27,7 +28,13 @@ public class SrtcMarker extends Marker {
 	public SrtcMarker(final int markerId, PhysicalSwitch sw, final TypeOfService toS) {
 		super(markerId, sw);
 		super.setMarkerType(OFMarkerType.ENSLAB_MARKER_SRTC);
-		this.toS = toS;
+		super.setTypeOfService(toS);
+		
+		this.committedInfoRate = 0;
+		this.committedBurstSize = 0L;
+		this.exceedBurstSize = 0L;
+		this.cTokenPenalty = 0;
+		this.eTokenPenalty = 0;
 	}
 	
 	public void setCommittedInfoRate(final int CIR) {
@@ -79,8 +86,14 @@ public class SrtcMarker extends Marker {
 		srtcmFeatures.setCIR(this.committedInfoRate);
 		srtcmFeatures.setCBS(this.committedBurstSize);
 		srtcmFeatures.setEBS(this.exceedBurstSize);
-		srtcmFeatures.setCBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_MAX);
-		srtcmFeatures.setEBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_MAX);
+		
+		if (this.markerId != OFMarker.OFPM_GLOBAL.getValue()) {
+			srtcmFeatures.setCBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_MAX);
+			srtcmFeatures.setEBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_MAX);
+		} else {
+			srtcmFeatures.setCBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_NA);
+			srtcmFeatures.setEBorrowSuccessProb(OFEnslabVendorData.OFPM_BRW_SUCC_NA);
+		}
 		
 		vendorData.setMarkerType(OFMarkerType.ENSLAB_MARKER_SRTC);
 		vendorData.setMarkerId(this.markerId);

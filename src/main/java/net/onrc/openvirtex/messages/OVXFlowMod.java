@@ -212,7 +212,7 @@ public class OVXFlowMod extends OFFlowMod implements Devirtualizable {
 	        
 			markAct.setMarkerId(sw.getTenantId());
 			this.approvedActions.add(0, markAct);
-			tosAct.setNetworkTypeOfService(tos.value());
+			tosAct.setNetworkTypeOfService(tos.getValue());
 			this.approvedActions.add(0, tosAct);
 		} catch (NetworkMappingException e) {
 			// TODO Auto-generated catch block

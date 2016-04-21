@@ -27,6 +27,11 @@ public class OFEnslabVendorExtensions {
                 OFMarkerRemoveVendorData.getInstantiable());
         enslabVendorId.registerVendorDataType(markerRemoveVendorData);
         
+        OFBasicVendorDataType markerConfigVendorData = new OFBasicVendorDataType(
+        		OFMarkerConfigVendorData.ENSLAB_MARKER_CONFIG,
+        		OFMarkerConfigVendorData.getInstantiable());
+        enslabVendorId.registerVendorDataType(markerConfigVendorData);
+        
 //        OFBasicVendorDataType markerStatisticsRequest = new OFBasicVendorDataType(
 //        		OFMarkerStatisticsRequest.ENSLAB_MARKER_STATS_REQUEST,
 //        		OFMarkerStatisticsRequest.getInstantiable());

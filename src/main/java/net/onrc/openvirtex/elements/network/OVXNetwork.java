@@ -40,6 +40,7 @@ import net.onrc.openvirtex.elements.datapath.Switch;
 import net.onrc.openvirtex.elements.host.Host;
 import net.onrc.openvirtex.elements.link.OVXLink;
 import net.onrc.openvirtex.elements.link.PhysicalLink;
+import net.onrc.openvirtex.elements.marker.Marker;
 import net.onrc.openvirtex.elements.marker.SrtcMarker;
 import net.onrc.openvirtex.elements.port.OVXPort;
 import net.onrc.openvirtex.elements.port.PhysicalPort;
@@ -320,10 +321,24 @@ public class OVXNetwork extends Network<OVXSwitch, OVXPort, OVXLink> implements
             virtualSwitch = new OVXSingleSwitch(switchId, this.tenantId);
             // SJM NIaaS: Add a marker to this OVXSwitch (Single Switch is considered only)
             PhysicalSwitch phySwitch = PhysicalNetwork.getInstance().getSwitch(dpids.get(0));
-            SrtcMarker marker = new SrtcMarker(this.tenantId, phySwitch, this.typeOfService);
-            marker.setCommittedBurstSize(this.committedBurstSize);
-            marker.setCommittedInfoRate(this.committedInfoRate);
-            marker.setExceedBurstSize(this.exceedBurstSize);
+            if (phySwitch == null) {
+            	log.error("Physical switch is NULL !!!!!!!!!!!!!!!!!!!!!");
+            }
+            Marker marker = new SrtcMarker(this.tenantId, phySwitch, this.typeOfService);
+            ((SrtcMarker) marker).setCommittedBurstSize(this.committedBurstSize);
+            ((SrtcMarker) marker).setCommittedInfoRate(this.committedInfoRate);
+            ((SrtcMarker) marker).setExceedBurstSize(this.exceedBurstSize);
+            phySwitch.addMarker(marker);
+            // SJM TEST
+            if (this.typeOfService == null) {
+            	log.error("OVXNetwork ToS is null !!!!!!");
+            }
+            
+            if (marker.getTypeOfService() == null) {
+            	log.error("Marker ToS is null!!!!!!!!");
+            }
+
+            // SJM TEST END
             virtualSwitch.setMarker(marker);
             // SJM NIaaS END
         } else {

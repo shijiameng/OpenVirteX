@@ -1,15 +1,12 @@
 package net.onrc.openvirtex.elements.marker;
 
-import java.util.Map;
-
 import org.openflow.vendor.enslab.OFMarkerType;
 
 import net.onrc.openvirtex.core.io.OVXSendMsg;
-import net.onrc.openvirtex.elements.Persistable;
 import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
 import net.onrc.openvirtex.elements.network.TypeOfService;
 
-public abstract class Marker implements Persistable, OVXSendMsg {
+public abstract class Marker implements OVXSendMsg {
 	
 	public static final String DB_KEY = "markers";
 	
@@ -17,7 +14,7 @@ public abstract class Marker implements Persistable, OVXSendMsg {
 	protected OFMarkerType type;
 	
 	protected TypeOfService toS;
-	protected int currentDataRate;
+	protected int meteredDataRate;
 	protected double weight;
 		
 	protected PhysicalSwitch parentSwitch;
@@ -40,7 +37,6 @@ public abstract class Marker implements Persistable, OVXSendMsg {
 	
 	public void setParentSwitch(PhysicalSwitch parentSwitch) {
 		this.parentSwitch = parentSwitch;
-		parentSwitch.addMarker(this);
 	}
 	
 	public void setMarkerType(final OFMarkerType type) {
@@ -59,17 +55,22 @@ public abstract class Marker implements Persistable, OVXSendMsg {
 		return this.parentSwitch;
 	}
 	
-	public void setCurrentDataRate(final int currentDataRate) {
-		this.currentDataRate = currentDataRate;
+	public void setMeteredDataRate(final int dataRate) {
+		this.meteredDataRate = dataRate;
 	}
 	
-	public int getCurrentDataRate() {
-		return this.currentDataRate;
+	public int getMeteredDataRate() {
+		return this.meteredDataRate;
 	}
 	
 	public void setTypeOfService(final TypeOfService toS) {
 		this.toS = toS;
 	}
+	
+	public void setTypeOfService(final byte value) {
+		this.toS = TypeOfService.valueOf(value);
+	}
+	
 	
 	public TypeOfService getTypeOfService() {
 		return this.toS;
@@ -90,29 +91,5 @@ public abstract class Marker implements Persistable, OVXSendMsg {
 	public abstract void boot();
 	
 	public abstract void tearDown();
-
-	@Override
-	public Map<String, Object> getDBIndex() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getDBKey() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getDBName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<String, Object> getDBObject() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 }

@@ -20,8 +20,9 @@ import net.onrc.openvirtex.elements.datapath.PhysicalSwitch;
 import net.onrc.openvirtex.messages.OVXStatisticsReply;
 import net.onrc.openvirtex.messages.OVXStatisticsRequest;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +30,6 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.openflow.protocol.statistics.OFStatistics;
 import org.openflow.protocol.statistics.OFVendorStatistics;
-import org.openflow.vendor.enslab.OFMarkerData;
 import org.openflow.vendor.enslab.statistics.OFMarkerStatisticsReply;
 
 public class OVXVendorStatistics extends OFVendorStatistics implements
@@ -50,7 +50,8 @@ public class OVXVendorStatistics extends OFVendorStatistics implements
         // TODO Auto-generated method stub
     	
     	List<? extends OFStatistics> vStatList = msg.getStatistics();
-        List<OFMarkerStatisticsReply> statList = new ArrayList<OFMarkerStatisticsReply>(); 
+//        List<OFMarkerStatisticsReply> statList = new ArrayList<OFMarkerStatisticsReply>(); 
+        Map<Integer, OFMarkerStatisticsReply> statMap = new HashMap<Integer, OFMarkerStatisticsReply>();
         
     	for (OFStatistics stat : vStatList) {
     		OVXVendorStatistics vStat = (OVXVendorStatistics) stat;
@@ -64,11 +65,17 @@ public class OVXVendorStatistics extends OFVendorStatistics implements
     			while (buffer.readable()) {
 		    		OFMarkerStatisticsReply reply = new OFMarkerStatisticsReply();	
 		    		reply.readFrom(buffer);
-		    		log.info(reply.toString());
-		    		log.info(reply.getMarkerData().toString());
-		    		statList.add(reply);
+		    		synchronized (log) {
+			    		log.info("DPID - {}", sw.getSwitchId());
+			    		log.info(reply.toString());
+			    		log.info(reply.getMarkerData().toString());
+		    		}
+//		    		statList.add(reply);
+		    		statMap.put(reply.getMarkerId(), reply);
     			}
     		}
+    		
+    		sw.setMarkerStatistics(statMap);
     	}
 
     }
