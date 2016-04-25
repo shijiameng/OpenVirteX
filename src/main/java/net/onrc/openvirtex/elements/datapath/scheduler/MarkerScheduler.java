@@ -39,7 +39,6 @@ public class MarkerScheduler implements OVXSendMsg {
 	private long getGlobalBucketTotalLend(final BucketType type) {
 		SrtcMarker globalMarker = (SrtcMarker) sw.getMarker(OFMarker.OFPM_GLOBAL.getValue());
 		if (globalMarker == null) {
-			log.fatal("globalMarker is NULL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 			return 0;
 		}
 		return getMarkerTotalBorrowed(globalMarker, type);
@@ -63,10 +62,6 @@ public class MarkerScheduler implements OVXSendMsg {
 	private double getGlobalTokenUsage(final SrtcMarker marker, final BucketType type) {
 		long totalLend = getGlobalBucketTotalLend(type);
 		long totalBorrowed = getMarkerTotalBorrowed(marker, type);
-		
-		// SJM TEST
-		log.info("Total Lend={}, Total Borrowed={}", totalLend, totalBorrowed);
-		// SJM TEST END
 		
 		return totalLend > 0 ? (double) totalBorrowed / (double) totalLend : 0; 
 	}
@@ -101,24 +96,17 @@ public class MarkerScheduler implements OVXSendMsg {
 		
 		if (currentDataRate > marker.getCommittedInfoRate()) {
 			double globalUsage = this.getGlobalTokenUsage(marker, type);
-			// SJM TEST
-			log.info("globalUsage={}, globalIdleIndicator={}", globalUsage, this.getGlobalIdleIndicator(type));
-			// SJM END
 			if (this.getGlobalIdleIndicator(type) < ALPHA) {
 				if (currentPenalty > 0) {
 					newPenalty = Math.min(currentPenalty + (1 + globalUsage) * (1 - marker.getWeight()) * currentPenalty, 1);
-					log.info("+++++++++++++increased newPenalty={}++++++++++++++++", newPenalty);
 				} else {
 					newPenalty = marker.getTypeOfService().initialPenalty();
-					log.info("+++++++++++++initial newPenalty={}++++++++++++++", newPenalty);
 				}
 			} else {
 				newPenalty = Math.max(currentPenalty - (2 - globalUsage) * marker.getWeight() * currentPenalty, 0);
-				log.info("++++++++++decreased 1 newPenalty={}+++++++++", newPenalty);
 			}
 		} else {
 			newPenalty = Math.max(currentPenalty - marker.getWeight() * currentPenalty, 0);
-			log.info("++++++++++decreased 2 newPenalty={}+++++++++", newPenalty);
 		}
 		
 		return newPenalty;
@@ -142,7 +130,7 @@ public class MarkerScheduler implements OVXSendMsg {
 		msg.setVendor(OFEnslabVendorData.ENSLAB_VENDOR_ID);
 		msg.setVendorData(vendorData);
 		msg.setLengthU(OVXVendor.MINIMUM_LENGTH + vendorData.getLength());
-		
+
 		this.sendMsg(msg, this);
 	}
 	
@@ -152,15 +140,15 @@ public class MarkerScheduler implements OVXSendMsg {
 		for (Marker marker : markers) {
 			if (marker.getMarkerId() == OFMarker.OFPM_GLOBAL.getValue())
 				continue;
+	
 			if (marker.getMarkerType() == OFMarkerType.ENSLAB_MARKER_SRTC) {
 				SrtcMarker srtcm = (SrtcMarker) marker;
 				double cPenalty = this.calcPenalty(srtcm, BucketType.C_BUCKET);
 				double ePenalty = this.calcPenalty(srtcm, BucketType.E_BUCKET);
-				// SJM TEST
-				log.info("cPenalty={}, ePenalty={}", cPenalty, ePenalty);
-				// SJM TEST END
+				
 				srtcm.setCTokenPenalty(cPenalty);
 				srtcm.setETokenPenalty(ePenalty);
+				
 				this.sendMarkerScheduler(srtcm);
 			}
 		}

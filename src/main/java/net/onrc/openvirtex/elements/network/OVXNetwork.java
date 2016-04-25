@@ -329,16 +329,6 @@ public class OVXNetwork extends Network<OVXSwitch, OVXPort, OVXLink> implements
             ((SrtcMarker) marker).setCommittedInfoRate(this.committedInfoRate);
             ((SrtcMarker) marker).setExceedBurstSize(this.exceedBurstSize);
             phySwitch.addMarker(marker);
-            // SJM TEST
-            if (this.typeOfService == null) {
-            	log.error("OVXNetwork ToS is null !!!!!!");
-            }
-            
-            if (marker.getTypeOfService() == null) {
-            	log.error("Marker ToS is null!!!!!!!!");
-            }
-
-            // SJM TEST END
             virtualSwitch.setMarker(marker);
             // SJM NIaaS END
         } else {

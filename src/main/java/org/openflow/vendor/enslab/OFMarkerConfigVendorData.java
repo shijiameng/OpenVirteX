@@ -60,8 +60,8 @@ public class OFMarkerConfigVendorData extends OFEnslabVendorData {
     @Override
     public void readFrom(final ChannelBuffer data, final int length) {
         super.readFrom(data, length);
-        this.markerType = OFMarkerType.valueOf(data.readInt());
         this.markerId = data.readInt();
+        this.markerType = OFMarkerType.valueOf(data.readInt());
         this.markerData = this.markerType.newInstance(OFEnslabVendorData.ENSLAB_MARKER_CONFIG);
         this.markerData.readFrom(data);
     }
@@ -69,8 +69,8 @@ public class OFMarkerConfigVendorData extends OFEnslabVendorData {
     @Override
     public void writeTo(final ChannelBuffer data) {
         super.writeTo(data);
-        data.writeInt(this.markerType.getValue());
         data.writeInt(this.markerId);
+        data.writeInt(this.markerType.getValue());
         this.markerData.writeTo(data);
     }
     
