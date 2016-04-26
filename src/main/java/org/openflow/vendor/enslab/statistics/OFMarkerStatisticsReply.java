@@ -42,8 +42,10 @@ public class OFMarkerStatisticsReply implements OFEnslabStatistics {
 	public void readFrom(ChannelBuffer data) {
 		this.markerId = data.readInt();
 		this.markerType = OFMarkerType.valueOf(data.readInt());
-		this.markerData = this.markerType.newInstance(ENSLAB_MARKER_STATS_REPLY);
-		markerData.readFrom(data);	
+		if (this.markerType == OFMarkerType.ENSLAB_MARKER_SRTC) {
+			this.markerData = this.markerType.newInstance(ENSLAB_MARKER_STATS_REPLY);
+			markerData.readFrom(data);
+		}
 	}
 
 	@Override

@@ -23,7 +23,9 @@ public enum OFMarkerType {
 				}
 			}),
 	
-	ENSLAB_MARKER_TRTC(2, "trTCM");
+	ENSLAB_MARKER_TRTC(2, "trTCM"),
+	
+	ENSLAB_MARKER_NONE(0xffffffff, "NONE");
 	
 	private int value;
 	private String name;
@@ -71,6 +73,9 @@ public enum OFMarkerType {
 			
 		case 2:
 			return OFMarkerType.ENSLAB_MARKER_TRTC;
+			
+		case 0xffffffff:
+			return OFMarkerType.ENSLAB_MARKER_NONE;
 			
 		default:
 			return null;

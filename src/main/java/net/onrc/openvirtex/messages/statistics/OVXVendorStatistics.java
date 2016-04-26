@@ -30,6 +30,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.openflow.protocol.statistics.OFStatistics;
 import org.openflow.protocol.statistics.OFVendorStatistics;
+import org.openflow.vendor.enslab.OFMarkerType;
 import org.openflow.vendor.enslab.statistics.OFMarkerStatisticsReply;
 
 public class OVXVendorStatistics extends OFVendorStatistics implements
@@ -50,7 +51,6 @@ public class OVXVendorStatistics extends OFVendorStatistics implements
         // TODO Auto-generated method stub
     	
     	List<? extends OFStatistics> vStatList = msg.getStatistics();
-//        List<OFMarkerStatisticsReply> statList = new ArrayList<OFMarkerStatisticsReply>(); 
         Map<Integer, OFMarkerStatisticsReply> statMap = new HashMap<Integer, OFMarkerStatisticsReply>();
         
     	for (OFStatistics stat : vStatList) {
@@ -65,12 +65,13 @@ public class OVXVendorStatistics extends OFVendorStatistics implements
     			while (buffer.readable()) {
 		    		OFMarkerStatisticsReply reply = new OFMarkerStatisticsReply();	
 		    		reply.readFrom(buffer);
+		    		if (reply.getMarkerType() != OFMarkerType.ENSLAB_MARKER_SRTC) 
+		    			break;
 		    		synchronized (log) {
 			    		log.info("DPID - {}", sw.getSwitchId());
 			    		log.info(reply.toString());
 			    		log.info(reply.getMarkerData().toString());
 		    		}
-//		    		statList.add(reply);
 		    		statMap.put(reply.getMarkerId(), reply);
     			}
     		}

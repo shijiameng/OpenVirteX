@@ -9,8 +9,6 @@ public class OFSrtcmFeatures implements OFMarkerData {
 	
     protected long CBS, EBS;
     
-    protected byte cBorrowSuccessProb, eBorrowSuccessProb;
-    
     public void setCIR(final int CIR) {
     	this.CIR = CIR;
     }
@@ -34,26 +32,10 @@ public class OFSrtcmFeatures implements OFMarkerData {
     public long getEBS() {
     	return this.EBS;
     }
-    
-    public void setCBorrowSuccessProb(final byte cBorrowSuccessProb) {
-    	this.cBorrowSuccessProb = cBorrowSuccessProb;
-    }
-    
-    public void setEBorrowSuccessProb(final byte eBorrowSuccessProb) {
-    	this.eBorrowSuccessProb = eBorrowSuccessProb;
-    }
-    
-    public byte getCBorrowSuccessProb() {
-    	return this.cBorrowSuccessProb;
-    }
-    
-    public byte getEBorrowSuccessProb() {
-    	return this.eBorrowSuccessProb;
-    }
 
 	@Override
 	public int getLength() {
-		return 32;
+		return 24;
 	}
 
 	@Override
@@ -62,10 +44,6 @@ public class OFSrtcmFeatures implements OFMarkerData {
 		data.readInt();
 		this.CBS = data.readLong();
 		this.EBS = data.readLong();
-		this.cBorrowSuccessProb = data.readByte();
-		this.eBorrowSuccessProb = data.readByte();
-		data.readInt();
-		data.readShort();
 	}
 
 	@Override
@@ -74,9 +52,5 @@ public class OFSrtcmFeatures implements OFMarkerData {
 		data.writeInt(0);
 		data.writeLong(this.CBS);
 		data.writeLong(this.EBS);
-		data.writeByte(this.cBorrowSuccessProb);
-		data.writeByte(this.eBorrowSuccessProb);
-		data.writeInt(0);
-		data.writeShort(0);
 	}
 }
