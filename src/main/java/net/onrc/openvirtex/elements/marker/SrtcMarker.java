@@ -61,6 +61,7 @@ public class SrtcMarker extends Marker {
 		OFMarkerAddVendorData vendorData = new OFMarkerAddVendorData();
 		OFSrtcmFeatures srtcmFeatures = new OFSrtcmFeatures();
 		
+		srtcmFeatures.setWeight((byte) this.getTypeOfService().getWeight());
 		srtcmFeatures.setCIR(this.committedInfoRate);
 		srtcmFeatures.setCBS(this.committedBurstSize);
 		srtcmFeatures.setEBS(this.exceedBurstSize);
