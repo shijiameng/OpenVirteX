@@ -86,7 +86,7 @@ def do_createNetwork(gopts, opts, args):
         print "createNetwork : Must specify controllerUrls, network_ip, network_mask, service_type, CIR, CBS, EBS"
         # SJM NIaaS END
         sys.exit()
-    type_map = { 'AF1': 32, 'AF2': 64, 'AF3': 96 }
+    type_map = { 'DF': 0, 'AF1': 32, 'AF2': 64, 'AF3': 96, 'EF': 0xb8 }
     req = { "controllerUrls" : buildControllerList(args[0]), \
                  "networkAddress" : args[1], "mask" : int(args[2]), \
                  # SJM NIaaS: Add ToS, CIR, CBS and EBS parameters
