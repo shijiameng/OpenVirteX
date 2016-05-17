@@ -324,12 +324,16 @@ public class OVXNetwork extends Network<OVXSwitch, OVXPort, OVXLink> implements
             if (phySwitch == null) {
             	log.error("Physical switch is NULL !!!!!!!!!!!!!!!!!!!!!");
             }
-            Marker marker = new SrtcMarker(this.tenantId, phySwitch, this.typeOfService);
-            ((SrtcMarker) marker).setCommittedBurstSize(this.committedBurstSize);
-            ((SrtcMarker) marker).setCommittedInfoRate(this.committedInfoRate);
-            ((SrtcMarker) marker).setExceedBurstSize(this.exceedBurstSize);
-            phySwitch.addMarker(marker);
-            virtualSwitch.setMarker(marker);
+            if (this.typeOfService == TypeOfService.AF1 || 
+            		this.typeOfService == TypeOfService.AF2 || 
+            		this.typeOfService == TypeOfService.AF3) {
+	            Marker marker = new SrtcMarker(this.tenantId, phySwitch, this.typeOfService);
+	            ((SrtcMarker) marker).setCommittedBurstSize(this.committedBurstSize);
+	            ((SrtcMarker) marker).setCommittedInfoRate(this.committedInfoRate);
+	            ((SrtcMarker) marker).setExceedBurstSize(this.exceedBurstSize);
+	            phySwitch.addMarker(marker);
+	            virtualSwitch.setMarker(marker);
+            }
             // SJM NIaaS END
         } else {
             virtualSwitch = new OVXBigSwitch(switchId, this.tenantId);
