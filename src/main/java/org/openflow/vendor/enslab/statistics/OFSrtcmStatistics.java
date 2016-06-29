@@ -11,6 +11,7 @@ public class OFSrtcmStatistics implements OFMarkerData {
     protected long nRedPackets, nRedBytes;
     protected long nCTokens, nETokens;
     protected long nCBorrowed, nEBorrowed;
+    protected long avgProcessingTime;
 
     public void setNumberOfPackets(final long nPackets) {
     	this.nPackets = nPackets;
@@ -108,6 +109,13 @@ public class OFSrtcmStatistics implements OFMarkerData {
     	this.nEBorrowed = nTokens;
     }
     
+    public long getAvgProcessingTime() {
+    	return this.avgProcessingTime;
+    }
+    
+    public void setAvgProcessingTime(final long avgProcTime) {
+    	this.avgProcessingTime =avgProcTime;
+    }
     
     @Override
     public String toString() {
@@ -121,7 +129,7 @@ public class OFSrtcmStatistics implements OFMarkerData {
 
 	@Override
 	public int getLength() {
-		return 96;
+		return 104;
 	}
 
 	@Override
@@ -138,6 +146,7 @@ public class OFSrtcmStatistics implements OFMarkerData {
 		this.nETokens = data.readLong();
 		this.nCBorrowed = data.readLong();
 		this.nEBorrowed = data.readLong();
+//		this.avgProcessingTime = data.readLong();
 	}
 
 	@Override
@@ -154,5 +163,6 @@ public class OFSrtcmStatistics implements OFMarkerData {
 		data.writeLong(this.nETokens);
 		data.writeLong(this.nCBorrowed);
 		data.writeLong(this.nEBorrowed);
+//		data.writeLong(this.avgProcessingTime);
 	}
 }
