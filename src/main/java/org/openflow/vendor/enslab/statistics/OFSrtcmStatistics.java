@@ -11,7 +11,6 @@ public class OFSrtcmStatistics implements OFMarkerData {
     protected long nRedPackets, nRedBytes;
     protected long nCTokens, nETokens;
     protected long nCBorrowed, nEBorrowed;
-    protected long avgPktProcTime;
 
     public void setNumberOfPackets(final long nPackets) {
     	this.nPackets = nPackets;
@@ -109,14 +108,6 @@ public class OFSrtcmStatistics implements OFMarkerData {
     	this.nEBorrowed = nTokens;
     }
     
-    public long getAvgPktProcTime() {
-    	return this.avgPktProcTime;
-    }
-    
-    public void setAvgPktProcTime(final long avgPktProcTime) {
-    	this.avgPktProcTime = avgPktProcTime;
-    }
-    
     @Override
     public String toString() {
     	return "n_packets=" + this.nPackets + ";n_bytes=" + this.nBytes +
@@ -124,8 +115,7 @@ public class OFSrtcmStatistics implements OFMarkerData {
     			";n_y_packets=" + this.nYellowPackets + ";n_y_bytes=" + this.nYellowBytes +
     			";n_r_packets=" + this.nRedPackets + ";n_r_bytes=" + this.nRedBytes +
     			";n_c_tokens=" + this.nCTokens + ";n_e_tokens=" + this.nETokens +
-    			";n_c_borrowed=" + this.nCBorrowed + ";n_e_borrowed=" + this.nEBorrowed +
-    			";avg_pkt_proc_time=" + this.avgPktProcTime;
+    			";n_c_borrowed=" + this.nCBorrowed + ";n_e_borrowed=" + this.nEBorrowed;
     }
 
 	@Override
@@ -147,7 +137,6 @@ public class OFSrtcmStatistics implements OFMarkerData {
 		this.nETokens = data.readLong();
 		this.nCBorrowed = data.readLong();
 		this.nEBorrowed = data.readLong();
-		this.avgPktProcTime = data.readLong();
 	}
 
 	@Override
@@ -164,6 +153,5 @@ public class OFSrtcmStatistics implements OFMarkerData {
 		data.writeLong(this.nETokens);
 		data.writeLong(this.nCBorrowed);
 		data.writeLong(this.nEBorrowed);
-		data.writeLong(this.avgPktProcTime);
 	}
 }
